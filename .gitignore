@@ -1,0 +1,122 @@
+# ============================================
+# Talent Management System - .gitignore
+# Vue 3 + TypeScript + Vite + Supabase + Vercel
+# ============================================
+
+# ----------------------
+# Dependencies
+# ----------------------
+node_modules
+
+# ----------------------
+# Build Output
+# ----------------------
+dist
+dist-ssr
+
+# ----------------------
+# Logs
+# ----------------------
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ----------------------
+# Environment Files
+# ----------------------
+.env
+.env.local
+.env.*.local
+*.local
+
+# ----------------------
+# Supabase (ローカル環境)
+# ----------------------
+supabase/.branches
+supabase/.temp
+.supabase
+supabase/config.toml.local
+supabase/.env
+
+# ----------------------
+# 秘密鍵・認証ファイル
+# ----------------------
+*.pem
+*.key
+*.p12
+service-account*.json
+*-credentials.json
+secrets/
+
+# ----------------------
+# データディレクトリ
+# ----------------------
+data/raw/*
+!data/raw/.gitkeep
+data/config/*
+!data/config/.gitkeep
+
+# ----------------------
+# テスト・カバレッジ
+# ----------------------
+coverage/
+.vitest/
+playwright-report/
+
+# ----------------------
+# キャッシュ
+# ----------------------
+.cache/
+.eslintcache
+
+# ----------------------
+# Vite
+# ----------------------
+vite.config.ts.timestamp-*
+
+# ----------------------
+# TypeScript
+# ----------------------
+*.tsbuildinfo
+
+# ----------------------
+# Vercel
+# ----------------------
+.vercel
+
+# ----------------------
+# Editor - VS Code
+# ----------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# ----------------------
+# Editor - JetBrains
+# ----------------------
+.idea/
+
+# ----------------------
+# OS Files - macOS
+# ----------------------
+.DS_Store
+._*
+
+# ----------------------
+# OS Files - Windows
+# ----------------------
+Thumbs.db
+Desktop.ini
+
+# ----------------------
+# Editor - その他
+# ----------------------
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
