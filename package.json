@@ -4,34 +4,24 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc -b && vite build",
-    "preview": "vite preview",
-    "lint": "vue-tsc --noEmit",
-    "seed": "npx ts-node --esm scripts/seed.ts"
-  },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.98.0",
-    "apexcharts": "^5.10.1",
-    "chart.js": "^4.5.1",
-    "dompurify": "^3.3.2",
-    "pinia": "^3.0.4",
-    "vue": "^3.5.25",
-    "vue-chartjs": "^5.3.3",
-    "vue-router": "^4.6.4",
-    "vue3-apexcharts": "^1.11.1"
+    "dev": "pnpm --filter @talent/client dev",
+    "dev:server": "pnpm --filter @talent/server dev",
+    "dev:all": "pnpm -r --parallel dev",
+    "build": "pnpm --filter @talent/types build && pnpm -r build",
+    "build:client": "pnpm --filter @talent/client build",
+    "build:server": "pnpm --filter @talent/server build",
+    "lint": "pnpm -r lint",
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "db:push": "pnpm --filter @talent/server db:push",
+    "db:generate": "pnpm --filter @talent/server db:generate",
+    "db:seed": "pnpm --filter @talent/server db:seed"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.2.1",
-    "@types/dompurify": "^3.0.5",
-    "@types/node": "^24.10.1",
-    "@vitejs/plugin-vue": "^6.0.2",
-    "@vue/tsconfig": "^0.8.1",
-    "autoprefixer": "^10.4.27",
-    "postcss": "^8.5.8",
-    "tailwindcss": "^4.2.1",
-    "typescript": "~5.9.3",
-    "vite": "^7.3.1",
-    "vue-tsc": "^3.1.5"
-  }
+    "typescript": "~5.9.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
 }
