@@ -26,7 +26,7 @@ const selectedJobType = ref('')
 const filteredEmployees = computed(() => {
   let result = employees
   if (selectedTeam.value) {
-    result = result.filter(e => e.team_id === selectedTeam.value)
+    result = result.filter(e => e.teamId === selectedTeam.value)
   }
   if (selectedJobType.value) {
     result = result.filter(e => e.job_type === selectedJobType.value)
@@ -45,7 +45,7 @@ const domainDistribution = computed(() => {
 
   filteredEmployees.value.forEach(emp => {
     if (emp.strengths) {
-      const top5 = emp.strengths.strengths_order.slice(0, 5)
+      const top5 = emp.strengths.strengthsOrder.slice(0, 5)
       top5.forEach(id => {
         const strength = getStrengthById(id)
         if (strength) counts[strength.domain]++
@@ -68,7 +68,7 @@ const strengthRanking = computed(() => {
 
   filteredEmployees.value.forEach(emp => {
     if (emp.strengths) {
-      const top5 = emp.strengths.strengths_order.slice(0, 5)
+      const top5 = emp.strengths.strengthsOrder.slice(0, 5)
       top5.forEach(id => {
         counts[id] = (counts[id] || 0) + 1
       })
@@ -94,7 +94,7 @@ const strengthRanking = computed(() => {
 // Team comparison
 const teamComparison = computed(() => {
   return teams.map(team => {
-    const teamMembers = employees.filter(e => e.team_id === team.id)
+    const teamMembers = employees.filter(e => e.teamId === team.id)
     const domainCounts: Record<StrengthDomain, number> = {
       executing: 0,
       influencing: 0,
@@ -104,7 +104,7 @@ const teamComparison = computed(() => {
 
     teamMembers.forEach(emp => {
       if (emp.strengths) {
-        const top5 = emp.strengths.strengths_order.slice(0, 5)
+        const top5 = emp.strengths.strengthsOrder.slice(0, 5)
         top5.forEach(id => {
           const strength = getStrengthById(id)
           if (strength) domainCounts[strength.domain]++
@@ -133,7 +133,7 @@ const rareStrengths = computed(() => {
 
   employees.forEach(emp => {
     if (emp.strengths) {
-      const top5 = emp.strengths.strengths_order.slice(0, 5)
+      const top5 = emp.strengths.strengthsOrder.slice(0, 5)
       top5.forEach(id => {
         counts[id] = (counts[id] || 0) + 1
       })

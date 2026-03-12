@@ -39,7 +39,7 @@ const workStyle = ref<SpiWorkStyle>({
   teamwork: 5,
   persistence: 5,
   flexibility: 5,
-  stress_tolerance: 5,
+  stressTolerance: 5,
 })
 
 const aptitudeScores = ref<SpiAptitudeScores>({
@@ -52,16 +52,16 @@ const testDate = ref('')
 
 // Load existing data when employee is selected
 watch(selectedEmployeeId, () => {
-  if (selectedEmployee.value?.spi_results) {
-    const spi = selectedEmployee.value.spi_results
-    personalityTraits.value = { ...spi.personality_traits }
-    workStyle.value = { ...spi.work_style }
-    aptitudeScores.value = { ...spi.aptitude_scores }
-    testDate.value = spi.test_date || ''
+  if (selectedEmployee.value?.spiResults) {
+    const spi = selectedEmployee.value.spiResults
+    personalityTraits.value = { ...spi.personalityTraits }
+    workStyle.value = { ...spi.workStyle }
+    aptitudeScores.value = { ...spi.aptitudeScores }
+    testDate.value = spi.testDate || ''
   } else {
     // Reset to defaults
     personalityTraits.value = { extroversion: 5, agreeableness: 5, conscientiousness: 5, neuroticism: 5, openness: 5 }
-    workStyle.value = { leadership: 5, independence: 5, teamwork: 5, persistence: 5, flexibility: 5, stress_tolerance: 5 }
+    workStyle.value = { leadership: 5, independence: 5, teamwork: 5, persistence: 5, flexibility: 5, stressTolerance: 5 }
     aptitudeScores.value = { verbal: 5, numerical: 5, logical: 5 }
     testDate.value = ''
   }
@@ -81,7 +81,7 @@ const workStyleLabels: Record<keyof SpiWorkStyle, string> = {
   teamwork: 'チームワーク',
   persistence: '粘り強さ',
   flexibility: '柔軟性',
-  stress_tolerance: 'ストレス耐性',
+  stressTolerance: 'ストレス耐性',
 }
 
 const aptitudeLabels: Record<keyof SpiAptitudeScores, string> = {

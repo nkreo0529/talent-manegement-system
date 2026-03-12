@@ -182,3 +182,7 @@ export function getDemoTeamById(id: string): TeamWithMembers | null {
     memberCount: members.length,
   }
 }
+
+export function getAllDemoEmployeesWithDetails(): EmployeeWithDetails[] {
+  return employeesData
+}

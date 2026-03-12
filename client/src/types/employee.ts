@@ -11,26 +11,26 @@ export interface Employee extends Tables<'employees'> {
 export interface EmployeeWithDetails extends Employee {
   strengths?: {
     id: string
-    strengths_order: string[]
+    strengthsOrder: string[]
   } | null
-  spi_results?: {
+  spiResults?: {
     id: string
-    personality_traits: SpiPersonalityTraits
-    work_style: SpiWorkStyle
-    aptitude_scores: SpiAptitudeScores
-    test_date: string | null
+    personalityTraits: SpiPersonalityTraits
+    workStyle: SpiWorkStyle
+    aptitudeScores: SpiAptitudeScores
+    testDate: string | null
   } | null
-  ai_profile?: {
+  aiProfile?: {
     id: string
-    profile_summary: string
-    work_style_analysis: string
-    collaboration_tips: string
-    development_suggestions: string
-    generated_at: string
+    profileSummary: string
+    workStyleAnalysis: string
+    collaborationTips: string
+    developmentSuggestions: string
+    generatedAt: string
   } | null
   careers?: Tables<'careers'>[]
   evaluations?: Tables<'evaluations'>[]
-  one_on_one_notes?: Tables<'one_on_one_notes'>[]
+  oneOnOneNotes?: Tables<'one_on_one_notes'>[]
 }
 
 // ストレングスファインダー 34資質
@@ -136,7 +136,10 @@ export function getStrengthById(id: string) {
 }
 
 // Helper function to get top 5 strengths
-export function getTop5Strengths(strengthsOrder: string[]) {
+export function getTop5Strengths(strengthsOrder: string[] | undefined | null) {
+  if (!strengthsOrder || !Array.isArray(strengthsOrder)) {
+    return []
+  }
   return strengthsOrder.slice(0, 5).map(id => getStrengthById(id)).filter(Boolean)
 }
 

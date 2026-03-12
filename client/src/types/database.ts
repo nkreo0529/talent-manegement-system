@@ -340,7 +340,7 @@ export interface SpiWorkStyle {
   teamwork: number          // チームワーク 1-10
   persistence: number       // 粘り強さ 1-10
   flexibility: number       // 柔軟性 1-10
-  stress_tolerance: number  // ストレス耐性 1-10
+  stressTolerance: number   // ストレス耐性 1-10
 }
 
 export interface SpiAptitudeScores {

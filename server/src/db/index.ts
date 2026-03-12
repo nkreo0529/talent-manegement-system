@@ -2,10 +2,14 @@ import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import * as schema from './schema'
 
-// Validate required environment variable
+// Check for DATABASE_URL - server requires database connection
 const databaseUrl = process.env.DATABASE_URL
+
 if (!databaseUrl) {
-  throw new Error('DATABASE_URL environment variable is not set. Please configure your database connection.')
+  console.warn('⚠️  DATABASE_URL not set.')
+  console.warn('   For demo mode: Run only the frontend with "cd client && npx pnpm dev"')
+  console.warn('   For full mode: Set DATABASE_URL in .env file')
+  process.exit(0) // Graceful exit for demo mode
 }
 
 // Neon serverless connection

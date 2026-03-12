@@ -64,7 +64,7 @@ function generateSpiWorkStyle(): SpiWorkStyle {
     teamwork: randomInt(4, 9),
     persistence: randomInt(4, 9),
     flexibility: randomInt(3, 8),
-    stress_tolerance: randomInt(4, 8),
+    stressTolerance: randomInt(4, 8),
   }
 }
 

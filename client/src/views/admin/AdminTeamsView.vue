@@ -20,7 +20,7 @@ const showModal = ref(false)
 const editingTeam = ref<any>(null)
 
 const getTeamMemberCount = (teamId: string) => {
-  return employees.filter(e => e.team_id === teamId).length
+  return employees.filter(e => e.teamId === teamId).length
 }
 
 const getManager = (managerId: string | null) => {

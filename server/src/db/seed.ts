@@ -125,10 +125,10 @@ async function seed() {
 
   // Create strengths for each employee
   console.log('💪 Creating strengths...')
-  const strengthIds = STRENGTHS_34.map(s => s.id)
+  const strengthIds: string[] = STRENGTHS_34.map((s: { id: string }) => s.id)
   const strengthsData = createdEmployees.map(emp => ({
     employeeId: emp.id,
-    strengthsOrder: shuffle(strengthIds),
+    strengthsOrder: shuffle(strengthIds) as string[],
   }))
   await db.insert(strengths).values(strengthsData)
   console.log(`  Created strengths for ${strengthsData.length} employees`)

@@ -63,7 +63,7 @@ function goToEmployee(id: string) {
 function getEmployeeStrengths(employeeId: string) {
   const emp = getDemoEmployeeById(employeeId)
   if (emp?.strengths) {
-    return getTop5Strengths(emp.strengths.strengths_order)
+    return getTop5Strengths(emp.strengths.strengthsOrder)
   }
   return []
 }

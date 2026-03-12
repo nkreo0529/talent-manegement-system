@@ -87,7 +87,7 @@ const spiWorkStyleLabels: Record<string, string> = {
   teamwork: 'チームワーク',
   persistence: '粘り強さ',
   flexibility: '柔軟性',
-  stress_tolerance: 'ストレス耐性',
+  stressTolerance: 'ストレス耐性',
 }
 
 const spiAptitudeLabels: Record<string, string> = {

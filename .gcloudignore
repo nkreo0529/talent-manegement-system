@@ -1,0 +1,7 @@
+node_modules/
+client/src/
+client/public/
+client/index.html
+docs/
+.git/
+*.md

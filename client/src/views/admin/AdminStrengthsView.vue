@@ -33,7 +33,7 @@ const selectedEmployee = computed(() => {
 
 const currentStrengths = computed(() => {
   if (!selectedEmployee.value?.strengths) return []
-  return selectedEmployee.value.strengths.strengths_order
+  return selectedEmployee.value.strengths.strengthsOrder
 })
 
 const top5 = computed(() => {

@@ -22,7 +22,7 @@ const selectedTeam = ref('')
 
 const filteredEmployees = computed(() => {
   if (!selectedTeam.value) return employees
-  return employees.filter(e => e.team_id === selectedTeam.value)
+  return employees.filter(e => e.teamId === selectedTeam.value)
 })
 
 // Trait labels
@@ -34,26 +34,26 @@ const traitLabels: Record<keyof SpiPersonalityTraits, string> = {
   openness: '開放性',
 }
 
-const workStyleLabels: Record<keyof SpiWorkStyle, string> = {
+const workStyleLabels: Record<string, string> = {
   leadership: 'リーダーシップ',
   independence: '独立性',
   teamwork: 'チームワーク',
   persistence: '粘り強さ',
   flexibility: '柔軟性',
-  stress_tolerance: 'ストレス耐性',
+  stressTolerance: 'ストレス耐性',
 }
 
 // Company average personality traits
 const companyAverageTraits = computed(() => {
-  const emps = filteredEmployees.value.filter(e => e.spi_results)
+  const emps = filteredEmployees.value.filter(e => e.spiResults)
   if (emps.length === 0) return null
 
   const totals: Record<string, number> = {}
   Object.keys(traitLabels).forEach(key => totals[key] = 0)
 
   emps.forEach(emp => {
-    if (emp.spi_results) {
-      Object.entries(emp.spi_results.personality_traits).forEach(([key, value]) => {
+    if (emp.spiResults) {
+      Object.entries(emp.spiResults.personalityTraits).forEach(([key, value]) => {
         totals[key] += value
       })
     }
@@ -68,15 +68,15 @@ const companyAverageTraits = computed(() => {
 
 // Company average work style
 const companyAverageWorkStyle = computed(() => {
-  const emps = filteredEmployees.value.filter(e => e.spi_results)
+  const emps = filteredEmployees.value.filter(e => e.spiResults)
   if (emps.length === 0) return null
 
   const totals: Record<string, number> = {}
   Object.keys(workStyleLabels).forEach(key => totals[key] = 0)
 
   emps.forEach(emp => {
-    if (emp.spi_results) {
-      Object.entries(emp.spi_results.work_style).forEach(([key, value]) => {
+    if (emp.spiResults) {
+      Object.entries(emp.spiResults.workStyle).forEach(([key, value]) => {
         totals[key] += value
       })
     }
@@ -92,7 +92,7 @@ const companyAverageWorkStyle = computed(() => {
 // Team comparison
 const teamComparison = computed(() => {
   return teams.map(team => {
-    const teamMembers = employees.filter(e => e.team_id === team.id && e.spi_results)
+    const teamMembers = employees.filter(e => e.teamId === team.id && e.spiResults)
     if (teamMembers.length === 0) return { team, traits: null, workStyle: null }
 
     const traitTotals: Record<string, number> = {}
@@ -101,11 +101,11 @@ const teamComparison = computed(() => {
     Object.keys(workStyleLabels).forEach(key => workStyleTotals[key] = 0)
 
     teamMembers.forEach(emp => {
-      if (emp.spi_results) {
-        Object.entries(emp.spi_results.personality_traits).forEach(([key, value]) => {
+      if (emp.spiResults) {
+        Object.entries(emp.spiResults.personalityTraits).forEach(([key, value]) => {
           traitTotals[key] += value
         })
-        Object.entries(emp.spi_results.work_style).forEach(([key, value]) => {
+        Object.entries(emp.spiResults.workStyle).forEach(([key, value]) => {
           workStyleTotals[key] += value
         })
       }
@@ -128,13 +128,13 @@ const teamComparison = computed(() => {
 
 // Distribution buckets for personality traits
 const traitDistribution = computed(() => {
-  const emps = filteredEmployees.value.filter(e => e.spi_results)
+  const emps = filteredEmployees.value.filter(e => e.spiResults)
 
   return Object.keys(traitLabels).map(traitKey => {
     const buckets = { low: 0, medium: 0, high: 0 }
 
     emps.forEach(emp => {
-      const value = emp.spi_results?.personality_traits[traitKey as keyof SpiPersonalityTraits] || 0
+      const value = emp.spiResults?.personalityTraits[traitKey as keyof SpiPersonalityTraits] || 0
       if (value <= 3) buckets.low++
       else if (value <= 7) buckets.medium++
       else buckets.high++

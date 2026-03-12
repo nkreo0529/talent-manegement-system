@@ -47,7 +47,7 @@ const teamStrengthsAnalysis = computed(() => {
   if (!currentTeam.value?.members) return null
 
   const allEmployees = getAllDemoEmployeesWithDetails()
-  const teamMembers = allEmployees.filter(e => e.team_id === teamId.value)
+  const teamMembers = allEmployees.filter(e => e.teamId === teamId.value)
 
   const domainCounts: Record<StrengthDomain, number> = {
     executing: 0,
@@ -60,7 +60,7 @@ const teamStrengthsAnalysis = computed(() => {
 
   teamMembers.forEach(member => {
     if (member.strengths) {
-      const top5 = member.strengths.strengths_order.slice(0, 5)
+      const top5 = member.strengths.strengthsOrder.slice(0, 5)
       top5.forEach(id => {
         const strength = getStrengthById(id)
         if (strength) {
@@ -98,7 +98,7 @@ function getMemberStrengths(employeeId: string) {
   const allEmployees = getAllDemoEmployeesWithDetails()
   const emp = allEmployees.find(e => e.id === employeeId)
   if (emp?.strengths) {
-    return getTop5Strengths(emp.strengths.strengths_order)
+    return getTop5Strengths(emp.strengths.strengthsOrder)
   }
   return []
 }

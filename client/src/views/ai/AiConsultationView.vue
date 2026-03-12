@@ -112,13 +112,13 @@ function getEmployeeContext(name: string) {
   const emp = allEmployees.find(e => e.name === name)
   if (!emp) return null
 
-  const strengths = emp.strengths ? getTop5Strengths(emp.strengths.strengths_order) : []
+  const strengths = emp.strengths ? getTop5Strengths(emp.strengths.strengthsOrder) : []
   return {
     name: emp.name,
     team: emp.team?.name || '未所属',
-    jobTitle: emp.job_title,
+    jobTitle: emp.jobTitle,
     top5: strengths.map(s => s?.name).join(', '),
-    aiProfile: emp.ai_profile?.profile_summary,
+    aiProfile: emp.aiProfile?.profileSummary,
   }
 }
 
