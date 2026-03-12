@@ -40,21 +40,21 @@ const gradeColors: Record<string, string> = {
 
 // New evaluation form
 const newEvaluation = ref({
-  employee_id: '',
+  employeeId: '',
   period: '2024H1',
-  overall_grade: 'B' as EvaluationGrade,
-  strengths_comment: '',
-  improvements_comment: '',
+  overallGrade: 'B' as EvaluationGrade,
+  strengthsComment: '',
+  improvementsComment: '',
   goals: '',
 })
 
 function openCreateModal() {
   newEvaluation.value = {
-    employee_id: '',
+    employeeId: '',
     period: selectedPeriod.value,
-    overall_grade: 'B',
-    strengths_comment: '',
-    improvements_comment: '',
+    overallGrade: 'B',
+    strengthsComment: '',
+    improvementsComment: '',
     goals: '',
   }
   showModal.value = true
@@ -129,13 +129,13 @@ function saveEvaluation() {
               <td class="px-6 py-4 text-center">
                 <span
                   class="inline-flex items-center justify-center w-10 h-10 text-lg font-bold rounded-lg"
-                  :class="gradeColors[ev.overall_grade]"
+                  :class="gradeColors[ev.overallGrade]"
                 >
-                  {{ ev.overall_grade }}
+                  {{ ev.overallGrade }}
                 </span>
               </td>
               <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 hidden md:table-cell">
-                <p class="line-clamp-1">{{ ev.strengths_comment || '-' }}</p>
+                <p class="line-clamp-1">{{ ev.strengthsComment || '-' }}</p>
               </td>
               <td class="px-6 py-4 text-right">
                 <button class="p-1 text-gray-400 hover:text-primary-600">
@@ -163,7 +163,7 @@ function saveEvaluation() {
             :class="gradeColors[grade]"
           >
             <p class="text-3xl font-bold">
-              {{ allEvaluations.filter(e => e.period === selectedPeriod && e.overall_grade === grade).length }}
+              {{ allEvaluations.filter(e => e.period === selectedPeriod && e.overallGrade === grade).length }}
             </p>
             <p class="text-sm mt-1">{{ grade }}評価</p>
           </div>
@@ -179,7 +179,7 @@ function saveEvaluation() {
           <div class="p-6 space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">社員</label>
-              <select v-model="newEvaluation.employee_id" class="input">
+              <select v-model="newEvaluation.employeeId" class="input">
                 <option value="">選択してください</option>
                 <option v-for="emp in employees" :key="emp.id" :value="emp.id">{{ emp.name }}</option>
               </select>
@@ -196,9 +196,9 @@ function saveEvaluation() {
                 <button
                   v-for="grade in grades"
                   :key="grade"
-                  @click="newEvaluation.overall_grade = grade"
+                  @click="newEvaluation.overallGrade = grade"
                   class="w-12 h-12 rounded-lg font-bold transition-all"
-                  :class="newEvaluation.overall_grade === grade
+                  :class="newEvaluation.overallGrade === grade
                     ? gradeColors[grade] + ' ring-2 ring-offset-2 ring-primary-500'
                     : 'bg-gray-100 text-gray-600'"
                 >
@@ -208,11 +208,11 @@ function saveEvaluation() {
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">強み</label>
-              <textarea v-model="newEvaluation.strengths_comment" rows="2" class="input"></textarea>
+              <textarea v-model="newEvaluation.strengthsComment" rows="2" class="input"></textarea>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">改善点</label>
-              <textarea v-model="newEvaluation.improvements_comment" rows="2" class="input"></textarea>
+              <textarea v-model="newEvaluation.improvementsComment" rows="2" class="input"></textarea>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">次期目標</label>

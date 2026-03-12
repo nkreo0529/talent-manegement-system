@@ -33,7 +33,7 @@ function openCreateModal() {
     id: null,
     name: '',
     description: '',
-    manager_id: '',
+    managerId: '',
   }
   showModal.value = true
 }
@@ -101,11 +101,11 @@ function deleteTeam(_id: string) {
               <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-dark-border flex items-center justify-center">
                   <span class="text-xs font-medium text-gray-600 dark:text-gray-400">
-                    {{ getManager(team.manager_id)?.name?.charAt(0) || '?' }}
+                    {{ getManager(team.managerId)?.name?.charAt(0) || '?' }}
                   </span>
                 </div>
                 <div class="text-sm">
-                  <p class="text-gray-900 dark:text-white">{{ getManager(team.manager_id)?.name || '未設定' }}</p>
+                  <p class="text-gray-900 dark:text-white">{{ getManager(team.managerId)?.name || '未設定' }}</p>
                   <p class="text-xs text-gray-500">マネージャー</p>
                 </div>
               </div>
@@ -137,7 +137,7 @@ function deleteTeam(_id: string) {
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">マネージャー</label>
-              <select v-model="editingTeam.manager_id" class="input">
+              <select v-model="editingTeam.managerId" class="input">
                 <option value="">未設定</option>
                 <option v-for="emp in employees" :key="emp.id" :value="emp.id">{{ emp.name }}</option>
               </select>

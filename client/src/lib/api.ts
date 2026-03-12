@@ -4,13 +4,14 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
 // Custom error class for API errors
 export class ApiError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-    public code?: string
-  ) {
+  status: number
+  code?: string
+
+  constructor(message: string, status: number, code?: string) {
     super(message)
     this.name = 'ApiError'
+    this.status = status
+    this.code = code
   }
 }
 

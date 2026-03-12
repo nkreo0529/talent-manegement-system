@@ -29,7 +29,7 @@ const filteredEmployees = computed(() => {
     result = result.filter(e => e.teamId === selectedTeam.value)
   }
   if (selectedJobType.value) {
-    result = result.filter(e => e.job_type === selectedJobType.value)
+    result = result.filter(e => e.jobType === selectedJobType.value)
   }
   return result
 })
