@@ -8,7 +8,7 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    minPasswordLength: 8,
+    minPasswordLength: 12,
   },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
@@ -18,10 +18,17 @@ export const auth = betterAuth({
       maxAge: 60 * 5, // 5 minutes
     },
   },
-  trustedOrigins: [
-    process.env.CORS_ORIGIN || 'http://localhost:5173',
-    'http://localhost:5173',
-  ],
+  trustedOrigins: process.env.CORS_ORIGIN
+    ? [process.env.CORS_ORIGIN]
+    : ['http://localhost:5173'],
+  advanced: {
+    cookiePrefix: 'talent',
+    defaultCookieAttributes: {
+      sameSite: 'strict' as const,
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+    },
+  },
 })
 
 export type Auth = typeof auth

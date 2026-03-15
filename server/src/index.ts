@@ -22,6 +22,7 @@ app.use('*', securityMiddleware)
 app.use('*', corsMiddleware)
 app.use('*', requestIdMiddleware)
 app.use('*', rateLimitMiddleware(100, 60000)) // 100 requests per minute
+app.use('/api/auth/*', rateLimitMiddleware(10, 60000)) // Stricter: 10 req/min for auth
 app.use('*', authMiddleware)
 
 // Health check
@@ -59,7 +60,11 @@ app.route('/api/admin', adminRoutes)
 
 // Error handling
 app.onError((err, c) => {
-  console.error(`[Error] ${err.message}`, err.stack)
+  if (process.env.NODE_ENV === 'production') {
+    console.error(`[Error] ${err.message}`)
+  } else {
+    console.error(`[Error] ${err.message}`, err.stack)
+  }
   return c.json(
     {
       error: {

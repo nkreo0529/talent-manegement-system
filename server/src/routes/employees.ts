@@ -59,10 +59,13 @@ employeeRoutes.get('/', zValidator('query', employeeQuerySchema), async (c) => {
   return c.json(result)
 })
 
+// UUID validation helper
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 // GET /api/employees/:id - Get employee by ID
 employeeRoutes.get('/:id', async (c) => {
   const id = c.req.param('id')
-  if (!id) return c.json({ error: { message: 'ID is required' } }, 400)
+  if (!id || !uuidRegex.test(id)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
   const employee = await employeeService.findById(id)
 
   if (!employee) {
@@ -99,7 +102,7 @@ employeeRoutes.post('/', requireRole('admin'), zValidator('json', employeeCreate
 // PUT /api/employees/:id - Update employee (admin/manager)
 employeeRoutes.put('/:id', requireRole('admin', 'manager'), zValidator('json', employeeUpdateSchema), async (c) => {
   const id = c.req.param('id')
-  if (!id) return c.json({ error: { message: 'ID is required' } }, 400)
+  if (!id || !uuidRegex.test(id)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
   const data = c.req.valid('json')
 
   const existing = await employeeService.findById(id)
@@ -122,7 +125,7 @@ employeeRoutes.put('/:id', requireRole('admin', 'manager'), zValidator('json', e
 // DELETE /api/employees/:id - Delete employee (admin only)
 employeeRoutes.delete('/:id', requireRole('admin'), async (c) => {
   const id = c.req.param('id')
-  if (!id) return c.json({ error: { message: 'ID is required' } }, 400)
+  if (!id || !uuidRegex.test(id)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
 
   const existing = await employeeService.findById(id)
   if (!existing) {

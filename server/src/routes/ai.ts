@@ -12,9 +12,9 @@ const consultationSchema = z.object({
   messages: z.array(
     z.object({
       role: z.enum(['user', 'assistant']),
-      content: z.string(),
+      content: z.string().max(10000),
     })
-  ),
+  ).max(50),
   context: z
     .object({
       employeeId: z.string().uuid().optional(),
@@ -22,6 +22,9 @@ const consultationSchema = z.object({
     })
     .optional(),
 })
+
+// UUID validation helper
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 // Routes
 aiRoutes.use('*', requireAuth)
@@ -58,7 +61,7 @@ aiRoutes.post('/consultation', zValidator('json', consultationSchema), async (c)
 // POST /api/ai/profiles/:employeeId/generate - Generate AI Profile
 aiRoutes.post('/profiles/:employeeId/generate', requireRole('admin', 'manager'), async (c) => {
   const employeeId = c.req.param('employeeId')
-  if (!employeeId) return c.json({ error: { message: 'Employee ID is required' } }, 400)
+  if (!employeeId || !uuidRegex.test(employeeId)) return c.json({ error: { message: 'Valid Employee UUID is required' } }, 400)
 
   try {
     const profile = await aiService.generateProfile(employeeId)
@@ -68,10 +71,10 @@ aiRoutes.post('/profiles/:employeeId/generate', requireRole('admin', 'manager'),
   }
 })
 
-// GET /api/ai/profiles/:employeeId - Get AI Profile
-aiRoutes.get('/profiles/:employeeId', async (c) => {
+// GET /api/ai/profiles/:employeeId - Get AI Profile (manager/admin)
+aiRoutes.get('/profiles/:employeeId', requireRole('admin', 'manager'), async (c) => {
   const employeeId = c.req.param('employeeId')
-  if (!employeeId) return c.json({ error: { message: 'Employee ID is required' } }, 400)
+  if (!employeeId || !uuidRegex.test(employeeId)) return c.json({ error: { message: 'Valid Employee UUID is required' } }, 400)
   const profile = await aiService.getProfile(employeeId)
 
   if (!profile) {
@@ -84,7 +87,7 @@ aiRoutes.get('/profiles/:employeeId', async (c) => {
 // POST /api/ai/teams/:teamId/analyze - Generate Team Analysis
 aiRoutes.post('/teams/:teamId/analyze', requireRole('admin', 'manager'), async (c) => {
   const teamId = c.req.param('teamId')
-  if (!teamId) return c.json({ error: { message: 'Team ID is required' } }, 400)
+  if (!teamId || !uuidRegex.test(teamId)) return c.json({ error: { message: 'Valid Team UUID is required' } }, 400)
 
   try {
     const analysis = await aiService.generateTeamAnalysis(teamId)
@@ -94,10 +97,10 @@ aiRoutes.post('/teams/:teamId/analyze', requireRole('admin', 'manager'), async (
   }
 })
 
-// GET /api/ai/teams/:teamId - Get Team Analysis
-aiRoutes.get('/teams/:teamId', async (c) => {
+// GET /api/ai/teams/:teamId - Get Team Analysis (manager/admin)
+aiRoutes.get('/teams/:teamId', requireRole('admin', 'manager'), async (c) => {
   const teamId = c.req.param('teamId')
-  if (!teamId) return c.json({ error: { message: 'Team ID is required' } }, 400)
+  if (!teamId || !uuidRegex.test(teamId)) return c.json({ error: { message: 'Valid Team UUID is required' } }, 400)
   const analysis = await aiService.getTeamAnalysis(teamId)
 
   if (!analysis) {

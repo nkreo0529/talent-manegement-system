@@ -11,13 +11,16 @@ const strengthsUpsertSchema = z.object({
   strengthsOrder: z.array(z.string()).length(34),
 })
 
+// UUID validation helper
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 // Routes
 strengthsRoutes.use('*', requireAuth)
 
-// GET /api/strengths/:employeeId - Get strengths by employee ID
-strengthsRoutes.get('/:employeeId', async (c) => {
+// GET /api/strengths/:employeeId - Get strengths by employee ID (manager/admin)
+strengthsRoutes.get('/:employeeId', requireRole('admin', 'manager'), async (c) => {
   const employeeId = c.req.param('employeeId')
-  if (!employeeId) return c.json({ error: { message: 'Employee ID is required' } }, 400)
+  if (!employeeId || !uuidRegex.test(employeeId)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
   const result = await strengthsService.findByEmployeeId(employeeId)
 
   if (!result) {
@@ -34,7 +37,7 @@ strengthsRoutes.put(
   zValidator('json', strengthsUpsertSchema),
   async (c) => {
     const employeeId = c.req.param('employeeId')
-    if (!employeeId) return c.json({ error: { message: 'Employee ID is required' } }, 400)
+    if (!employeeId || !uuidRegex.test(employeeId)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
     const { strengthsOrder } = c.req.valid('json')
 
     const result = await strengthsService.upsert(employeeId, strengthsOrder)
@@ -45,7 +48,7 @@ strengthsRoutes.put(
 // DELETE /api/strengths/:employeeId - Delete strengths (admin only)
 strengthsRoutes.delete('/:employeeId', requireRole('admin'), async (c) => {
   const employeeId = c.req.param('employeeId')
-  if (!employeeId) return c.json({ error: { message: 'Employee ID is required' } }, 400)
+  if (!employeeId || !uuidRegex.test(employeeId)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
   await strengthsService.delete(employeeId)
   return c.json({ success: true })
 })

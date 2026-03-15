@@ -31,13 +31,16 @@ const spiUpsertSchema = z.object({
   testDate: z.string().optional().nullable(),
 })
 
+// UUID validation helper
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 // Routes
 spiRoutes.use('*', requireAuth)
 
-// GET /api/spi/:employeeId - Get SPI results by employee ID
-spiRoutes.get('/:employeeId', async (c) => {
+// GET /api/spi/:employeeId - Get SPI results by employee ID (manager/admin)
+spiRoutes.get('/:employeeId', requireRole('admin', 'manager'), async (c) => {
   const employeeId = c.req.param('employeeId')
-  if (!employeeId) return c.json({ error: { message: 'Employee ID is required' } }, 400)
+  if (!employeeId || !uuidRegex.test(employeeId)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
   const result = await spiService.findByEmployeeId(employeeId)
 
   if (!result) {
@@ -54,7 +57,7 @@ spiRoutes.put(
   zValidator('json', spiUpsertSchema),
   async (c) => {
     const employeeId = c.req.param('employeeId')
-    if (!employeeId) return c.json({ error: { message: 'Employee ID is required' } }, 400)
+    if (!employeeId || !uuidRegex.test(employeeId)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
     const data = c.req.valid('json')
 
     const result = await spiService.upsert(employeeId, {
@@ -70,7 +73,7 @@ spiRoutes.put(
 // DELETE /api/spi/:employeeId - Delete SPI results (admin only)
 spiRoutes.delete('/:employeeId', requireRole('admin'), async (c) => {
   const employeeId = c.req.param('employeeId')
-  if (!employeeId) return c.json({ error: { message: 'Employee ID is required' } }, 400)
+  if (!employeeId || !uuidRegex.test(employeeId)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
   await spiService.delete(employeeId)
   return c.json({ success: true })
 })

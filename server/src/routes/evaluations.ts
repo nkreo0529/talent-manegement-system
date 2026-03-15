@@ -18,21 +18,24 @@ const evaluationCreateSchema = z.object({
 
 const evaluationUpdateSchema = evaluationCreateSchema.partial().omit({ employeeId: true })
 
+// UUID validation helper
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 // Routes
 evaluationRoutes.use('*', requireAuth)
 
-// GET /api/evaluations/employee/:employeeId - Get evaluations by employee ID
-evaluationRoutes.get('/employee/:employeeId', async (c) => {
+// GET /api/evaluations/employee/:employeeId - Get evaluations by employee ID (manager/admin)
+evaluationRoutes.get('/employee/:employeeId', requireRole('admin', 'manager'), async (c) => {
   const employeeId = c.req.param('employeeId')
-  if (!employeeId) return c.json({ error: { message: 'Employee ID is required' } }, 400)
+  if (!employeeId || !uuidRegex.test(employeeId)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
   const results = await evaluationService.findByEmployeeId(employeeId)
   return c.json({ data: results })
 })
 
-// GET /api/evaluations/:id - Get evaluation by ID
-evaluationRoutes.get('/:id', async (c) => {
+// GET /api/evaluations/:id - Get evaluation by ID (manager/admin)
+evaluationRoutes.get('/:id', requireRole('admin', 'manager'), async (c) => {
   const id = c.req.param('id')
-  if (!id) return c.json({ error: { message: 'ID is required' } }, 400)
+  if (!id || !uuidRegex.test(id)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
   const result = await evaluationService.findById(id)
 
   if (!result) {
@@ -77,7 +80,7 @@ evaluationRoutes.put(
   zValidator('json', evaluationUpdateSchema),
   async (c) => {
     const id = c.req.param('id')
-    if (!id) return c.json({ error: { message: 'ID is required' } }, 400)
+    if (!id || !uuidRegex.test(id)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
     const data = c.req.valid('json')
 
     const existing = await evaluationService.findById(id)
@@ -93,7 +96,7 @@ evaluationRoutes.put(
 // DELETE /api/evaluations/:id - Delete evaluation (admin only)
 evaluationRoutes.delete('/:id', requireRole('admin'), async (c) => {
   const id = c.req.param('id')
-  if (!id) return c.json({ error: { message: 'ID is required' } }, 400)
+  if (!id || !uuidRegex.test(id)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
 
   const existing = await evaluationService.findById(id)
   if (!existing) {

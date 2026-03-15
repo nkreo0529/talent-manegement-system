@@ -1,19 +1,14 @@
 import { cors } from 'hono/cors'
 
-// Build unique allowed origins list
+// Build allowed origins list from environment
 function getAllowedOrigins(): string[] {
-  const origins = new Set<string>([
-    'http://localhost:5173',
-    'http://localhost:3000',
-  ])
-
-  // Add CORS_ORIGIN from env if set
   const envOrigin = process.env.CORS_ORIGIN
   if (envOrigin) {
-    origins.add(envOrigin)
+    // In production, use only explicitly configured origins
+    return [envOrigin]
   }
-
-  return Array.from(origins)
+  // Development fallback
+  return ['http://localhost:5173', 'http://localhost:3000']
 }
 
 export const corsMiddleware = cors({
@@ -26,9 +21,12 @@ export const corsMiddleware = cors({
       return origin
     }
 
-    // For requests without origin (same-origin, server-to-server), allow through
-    // but don't set Access-Control-Allow-Origin header
+    // For requests without origin (same-origin, server-to-server)
     if (!origin) {
+      // In production, reject requests without explicit origin
+      if (process.env.NODE_ENV === 'production') {
+        return null
+      }
       return allowedOrigins[0]
     }
 
@@ -36,7 +34,7 @@ export const corsMiddleware = cors({
     return null
   },
   credentials: true,
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   exposeHeaders: ['Content-Length', 'X-Request-Id'],
   maxAge: 86400,

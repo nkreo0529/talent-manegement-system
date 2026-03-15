@@ -11,21 +11,23 @@ const ALLOWED_TAGS = ['strong', 'em', 'code', 'br', 'p', 'ul', 'ol', 'li', 'h1',
 const ALLOWED_ATTR = ['class']
 
 function sanitizeAndFormatMessage(content: string): string {
-  // First, escape any existing HTML to prevent injection
+  // 1. Escape all HTML entities first to neutralize any injected HTML
   const escaped = content
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
 
-  // Then apply our markdown-like formatting
+  // 2. Apply safe markdown-like formatting on escaped content
   const formatted = escaped
     .replace(/\n/g, '<br>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/`(.+?)`/g, '<code class="bg-gray-200 dark:bg-gray-700 px-1 rounded">$1</code>')
+    .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+?)`/g, '<code class="bg-gray-200 dark:bg-gray-700 px-1 rounded">$1</code>')
     .replace(/^### (.+)$/gm, '<h3 class="font-semibold mt-2">$1</h3>')
     .replace(/^## (.+)$/gm, '<h2 class="font-bold mt-3">$1</h2>')
 
-  // Finally, sanitize the result
+  // 3. Final DOMPurify pass as defense-in-depth
   return DOMPurify.sanitize(formatted, {
     ALLOWED_TAGS,
     ALLOWED_ATTR,

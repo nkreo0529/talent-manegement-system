@@ -43,8 +43,10 @@ export const useAuthStore = defineStore('auth', () => {
   const initialized = ref(false)
   const error = ref<string | null>(null)
 
-  // Demo mode for development without backend
-  const isDemoMode = ref(import.meta.env.VITE_DEMO_MODE === 'true')
+  // Demo mode - only available in development builds
+  const isDemoMode = ref(
+    import.meta.env.DEV && import.meta.env.VITE_DEMO_MODE === 'true'
+  )
 
   const isAuthenticated = computed(() => {
     if (isDemoMode.value) return true

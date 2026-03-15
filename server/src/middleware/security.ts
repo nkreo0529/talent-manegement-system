@@ -6,6 +6,24 @@ export const securityMiddleware = secureHeaders({
   xContentTypeOptions: 'nosniff',
   xXssProtection: '1; mode=block',
   referrerPolicy: 'strict-origin-when-cross-origin',
+  strictTransportSecurity: 'max-age=31536000; includeSubDomains',
+  contentSecurityPolicy: process.env.NODE_ENV === 'production'
+    ? {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'blob:'],
+        connectSrc: ["'self'", process.env.CORS_ORIGIN || ''].filter(Boolean),
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+      }
+    : undefined,
+  permissionsPolicy: {
+    camera: [],
+    microphone: [],
+    geolocation: [],
+  },
 })
 
 // Rate limiting middleware (simple in-memory implementation)

@@ -20,6 +20,9 @@ RUN pnpm --filter @talent/types build
 
 WORKDIR /app/server
 
+# Run as non-root user for security
+USER node
+
 ENV NODE_ENV=production
 ENV PORT=8080
 

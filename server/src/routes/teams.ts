@@ -23,6 +23,9 @@ const teamCreateSchema = z.object({
 
 const teamUpdateSchema = teamCreateSchema.partial()
 
+// UUID validation helper
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 // Routes
 teamRoutes.use('*', requireAuth)
 
@@ -46,7 +49,7 @@ teamRoutes.get('/', zValidator('query', teamQuerySchema), async (c) => {
 // GET /api/teams/:id - Get team by ID with members
 teamRoutes.get('/:id', async (c) => {
   const id = c.req.param('id')
-  if (!id) return c.json({ error: { message: 'ID is required' } }, 400)
+  if (!id || !uuidRegex.test(id)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
   const team = await teamService.findById(id)
 
   if (!team) {
@@ -70,7 +73,7 @@ teamRoutes.post('/', requireRole('admin'), zValidator('json', teamCreateSchema),
 // PUT /api/teams/:id - Update team (admin/manager)
 teamRoutes.put('/:id', requireRole('admin', 'manager'), zValidator('json', teamUpdateSchema), async (c) => {
   const id = c.req.param('id')
-  if (!id) return c.json({ error: { message: 'ID is required' } }, 400)
+  if (!id || !uuidRegex.test(id)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
   const data = c.req.valid('json')
 
   const existing = await teamService.findById(id)
@@ -85,7 +88,7 @@ teamRoutes.put('/:id', requireRole('admin', 'manager'), zValidator('json', teamU
 // DELETE /api/teams/:id - Delete team (admin only)
 teamRoutes.delete('/:id', requireRole('admin'), async (c) => {
   const id = c.req.param('id')
-  if (!id) return c.json({ error: { message: 'ID is required' } }, 400)
+  if (!id || !uuidRegex.test(id)) return c.json({ error: { message: 'Valid UUID is required' } }, 400)
 
   const existing = await teamService.findById(id)
   if (!existing) {
