@@ -563,11 +563,26 @@ gcloud artifacts repositories create talent-mgmt-api \
 | Dockerfile | `-f server/Dockerfile` | ルートの `Dockerfile` を使用 | `server/Dockerfile` はマルチステージ版で動作しない（moduleResolution非互換） |
 | Artifact Registry名 | `talent-api/` | `talent-mgmt-api/` | サービス名と統一 |
 
+### 解決したトラブル
+
+| # | 問題 | 原因 | 解決方法 | 学び |
+|---|------|------|---------|------|
+| 1 | `Cannot update environment variable [DATABASE_URL] to the given type` | `DATABASE_URL` 等が通常の環境変数として設定済みだが、ワークフローはSecret Manager参照として設定しようとした | `--remove-env-vars` と `--update-secrets` を**同時に**実行して型を切り替え | Cloud Runでは環境変数とシークレット参照は別の型。型の変更は削除と再設定を1コマンドで行う必要がある |
+
+```bash
+# 環境変数 → Secret Manager参照への切り替えコマンド
+gcloud run services update talent-mgmt-api \
+  --region asia-northeast1 \
+  --remove-env-vars DATABASE_URL,BETTER_AUTH_SECRET,CORS_ORIGIN \
+  --update-secrets "DATABASE_URL=DATABASE_URL:latest,BETTER_AUTH_SECRET=BETTER_AUTH_SECRET:latest,CORS_ORIGIN=CORS_ORIGIN:latest"
+```
+
 ### 学んだこと
 - WIFはサービスアカウントキーなしで安全に認証できる。OIDCトークンは短命で自動失効するため、キー漏洩リスクがない
 - `--attribute-condition` でリポジトリを制限しないと、他のGitHubリポジトリからもGCPにアクセスできてしまう
 - Secret Managerで一元管理すると、環境変数の値を変更する際にCloud Runの再デプロイが不要
 - Vercel Git連携済みの場合、GitHub Actionsからの追加デプロイは二重デプロイになる
+- Cloud Runの環境変数とSecret Manager参照は**別の型**。切り替え時は削除と設定を同時に行わないとコンテナ起動失敗になる
 
 ---
 
