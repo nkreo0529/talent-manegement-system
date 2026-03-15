@@ -154,7 +154,7 @@ const hasActiveFilters = computed(() => {
         v-else-if="employees.length === 0"
         class="card text-center py-12"
       >
-        <span class="material-icons text-5xl text-gray-300 dark:text-gray-600">person_search</span>
+        <span class="material-icons text-5xl text-gray-400 dark:text-gray-400">person_search</span>
         <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">社員が見つかりません</h3>
         <p class="mt-2 text-gray-600 dark:text-gray-400">
           検索条件を変更してお試しください
@@ -187,7 +187,7 @@ const hasActiveFilters = computed(() => {
               <p class="text-sm text-gray-500 dark:text-gray-400">
                 {{ employee.jobTitle || JOB_TYPE_LABELS[employee.jobType || 'other'] }}
               </p>
-              <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {{ employee.team?.name || '未所属' }}
               </p>
 

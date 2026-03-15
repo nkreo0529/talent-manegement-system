@@ -31,11 +31,11 @@ const periods = ['2024H2', '2024H1', '2023H2', '2023H1']
 const grades: EvaluationGrade[] = ['S', 'A', 'B', 'C', 'D']
 
 const gradeColors: Record<string, string> = {
-  S: 'bg-purple-100 text-purple-800',
-  A: 'bg-green-100 text-green-800',
-  B: 'bg-blue-100 text-blue-800',
-  C: 'bg-amber-100 text-amber-800',
-  D: 'bg-red-100 text-red-800',
+  S: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+  A: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+  B: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+  C: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
+  D: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
 }
 
 // New evaluation form
@@ -109,10 +109,10 @@ function saveEvaluation() {
         <table class="w-full">
           <thead class="bg-gray-50 dark:bg-dark-border">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">社員</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">期間</th>
-              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">評価</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">強み</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">社員</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">期間</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">評価</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">強み</th>
               <th class="px-6 py-3"></th>
             </tr>
           </thead>

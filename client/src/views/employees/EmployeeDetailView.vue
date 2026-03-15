@@ -133,7 +133,7 @@ const gradeColors: Record<string, string> = {
 
       <!-- Employee not found -->
       <div v-else-if="!currentEmployee" class="card text-center py-12">
-        <span class="material-icons text-5xl text-gray-300">person_off</span>
+        <span class="material-icons text-5xl text-gray-400">person_off</span>
         <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">社員が見つかりません</h3>
         <button @click="goBack" class="btn-primary mt-4">一覧に戻る</button>
       </div>
@@ -166,7 +166,7 @@ const gradeColors: Record<string, string> = {
               <p class="text-gray-600 dark:text-gray-400 mt-1">
                 {{ currentEmployee.jobTitle || JOB_TYPE_LABELS[currentEmployee.jobType || 'other'] }}
               </p>
-              <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {{ currentEmployee.team?.name || '未所属' }} • {{ currentEmployee.email }}
               </p>
 
@@ -265,7 +265,7 @@ const gradeColors: Record<string, string> = {
                 >
                   <p class="font-medium text-gray-900 dark:text-white">{{ career.position }}</p>
                   <p class="text-sm text-gray-600 dark:text-gray-400">{{ career.companyName }}</p>
-                  <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {{ formatDate(career.startDate) }} - {{ career.isCurrent ? '現在' : formatDate(career.endDate) }}
                   </p>
                 </div>
@@ -279,7 +279,7 @@ const gradeColors: Record<string, string> = {
 
             <!-- Domain distribution -->
             <div>
-              <h3 class="text-md font-medium text-gray-700 dark:text-gray-300 mb-4">4領域バランス</h3>
+              <h3 class="text-md font-medium text-gray-700 dark:text-gray-400 mb-4">4領域バランス</h3>
               <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div
                   v-for="(domain, key) in DOMAIN_NAMES"
@@ -303,7 +303,7 @@ const gradeColors: Record<string, string> = {
                   <span class="material-icons mr-2">thumb_up</span>
                   得意なこと
                 </h4>
-                <ul class="mt-3 space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                <ul class="mt-3 space-y-2 text-sm text-gray-700 dark:text-gray-400">
                   <li v-for="strength in top5Strengths.slice(0, 3)" :key="strength?.id" class="flex items-start">
                     <span class="material-icons text-green-600 text-sm mr-2 mt-0.5">check_circle</span>
                     {{ strength?.name }}の資質を活かした活動
@@ -315,7 +315,7 @@ const gradeColors: Record<string, string> = {
                   <span class="material-icons mr-2">info</span>
                   注意が必要なこと
                 </h4>
-                <ul class="mt-3 space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                <ul class="mt-3 space-y-2 text-sm text-gray-700 dark:text-gray-400">
                   <li class="flex items-start">
                     <span class="material-icons text-amber-600 text-sm mr-2 mt-0.5">warning</span>
                     弱い領域のタスクには適切なサポートを
@@ -339,7 +339,7 @@ const gradeColors: Record<string, string> = {
             <div v-if="currentEmployee.aiProfile" class="space-y-6">
               <div class="p-4 bg-primary-50 dark:bg-primary-900/10 rounded-lg">
                 <h3 class="font-medium text-primary-800 dark:text-primary-400 mb-2">プロフィールサマリー</h3>
-                <p class="text-gray-700 dark:text-gray-300">{{ currentEmployee.aiProfile.profileSummary }}</p>
+                <p class="text-gray-700 dark:text-gray-400">{{ currentEmployee.aiProfile.profileSummary }}</p>
               </div>
 
               <div>
@@ -357,12 +357,12 @@ const gradeColors: Record<string, string> = {
                 <p class="text-gray-600 dark:text-gray-400">{{ currentEmployee.aiProfile.developmentSuggestions }}</p>
               </div>
 
-              <p class="text-xs text-gray-400 dark:text-gray-500">
+              <p class="text-xs text-gray-400 dark:text-gray-400">
                 生成日: {{ formatDate(currentEmployee.aiProfile.generatedAt) }}
               </p>
             </div>
             <div v-else class="text-center py-8">
-              <span class="material-icons text-4xl text-gray-300">auto_awesome</span>
+              <span class="material-icons text-4xl text-gray-400">auto_awesome</span>
               <p class="mt-2 text-gray-500 dark:text-gray-400">AIプロフィールは未生成です</p>
             </div>
           </div>
@@ -374,7 +374,7 @@ const gradeColors: Record<string, string> = {
             <div v-if="currentEmployee.strengths" class="space-y-6">
               <!-- Top 5 detailed -->
               <div>
-                <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-4">TOP 5 資質</h3>
+                <h3 class="font-medium text-gray-700 dark:text-gray-400 mb-4">TOP 5 資質</h3>
                 <div class="space-y-3">
                   <div
                     v-for="(strength, index) in top5Strengths"
@@ -403,7 +403,7 @@ const gradeColors: Record<string, string> = {
 
               <!-- All 34 (first 10) -->
               <div>
-                <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-4">全34資質（TOP10）</h3>
+                <h3 class="font-medium text-gray-700 dark:text-gray-400 mb-4">全34資質（TOP10）</h3>
                 <div class="flex flex-wrap gap-2">
                   <span
                     v-for="(strengthId, index) in currentEmployee.strengths.strengthsOrder.slice(0, 10)"
@@ -418,7 +418,7 @@ const gradeColors: Record<string, string> = {
               </div>
             </div>
             <div v-else class="text-center py-8">
-              <span class="material-icons text-4xl text-gray-300">star_border</span>
+              <span class="material-icons text-4xl text-gray-400">star_border</span>
               <p class="mt-2 text-gray-500 dark:text-gray-400">SF結果は未登録です</p>
             </div>
           </div>
@@ -430,7 +430,7 @@ const gradeColors: Record<string, string> = {
             <div v-if="currentEmployee.spiResults" class="space-y-8">
               <!-- Personality traits -->
               <div>
-                <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-4">性格特性</h3>
+                <h3 class="font-medium text-gray-700 dark:text-gray-400 mb-4">性格特性</h3>
                 <div class="space-y-4">
                   <div
                     v-for="(value, key) in currentEmployee.spiResults.personalityTraits"
@@ -452,7 +452,7 @@ const gradeColors: Record<string, string> = {
 
               <!-- Work style -->
               <div>
-                <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-4">ワークスタイル</h3>
+                <h3 class="font-medium text-gray-700 dark:text-gray-400 mb-4">ワークスタイル</h3>
                 <div class="space-y-4">
                   <div
                     v-for="(value, key) in currentEmployee.spiResults.workStyle"
@@ -474,7 +474,7 @@ const gradeColors: Record<string, string> = {
 
               <!-- Aptitude -->
               <div>
-                <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-4">能力適性</h3>
+                <h3 class="font-medium text-gray-700 dark:text-gray-400 mb-4">能力適性</h3>
                 <div class="grid grid-cols-3 gap-4">
                   <div
                     v-for="(value, key) in currentEmployee.spiResults.aptitudeScores"
@@ -488,12 +488,12 @@ const gradeColors: Record<string, string> = {
                 </div>
               </div>
 
-              <p class="text-xs text-gray-400 dark:text-gray-500">
+              <p class="text-xs text-gray-400 dark:text-gray-400">
                 テスト日: {{ formatDate(currentEmployee.spiResults.testDate) }}
               </p>
             </div>
             <div v-else class="text-center py-8">
-              <span class="material-icons text-4xl text-gray-300">analytics</span>
+              <span class="material-icons text-4xl text-gray-400">analytics</span>
               <p class="mt-2 text-gray-500 dark:text-gray-400">SPI結果は未登録です</p>
             </div>
           </div>
@@ -521,26 +521,26 @@ const gradeColors: Record<string, string> = {
                   <div class="space-y-3 text-sm">
                     <div v-if="evaluation.strengthsComment">
                       <span class="text-gray-500 dark:text-gray-400">強み:</span>
-                      <p class="text-gray-700 dark:text-gray-300 mt-1">{{ evaluation.strengthsComment }}</p>
+                      <p class="text-gray-700 dark:text-gray-400 mt-1">{{ evaluation.strengthsComment }}</p>
                     </div>
                     <div v-if="evaluation.improvementsComment">
                       <span class="text-gray-500 dark:text-gray-400">改善点:</span>
-                      <p class="text-gray-700 dark:text-gray-300 mt-1">{{ evaluation.improvementsComment }}</p>
+                      <p class="text-gray-700 dark:text-gray-400 mt-1">{{ evaluation.improvementsComment }}</p>
                     </div>
                     <div v-if="evaluation.goals">
                       <span class="text-gray-500 dark:text-gray-400">次期目標:</span>
-                      <p class="text-gray-700 dark:text-gray-300 mt-1">{{ evaluation.goals }}</p>
+                      <p class="text-gray-700 dark:text-gray-400 mt-1">{{ evaluation.goals }}</p>
                     </div>
                   </div>
                 </div>
               </div>
               <div v-else class="text-center py-8">
-                <span class="material-icons text-4xl text-gray-300">grade</span>
+                <span class="material-icons text-4xl text-gray-400">grade</span>
                 <p class="mt-2 text-gray-500 dark:text-gray-400">評価履歴はありません</p>
               </div>
             </template>
             <div v-else class="text-center py-8">
-              <span class="material-icons text-4xl text-gray-300">lock</span>
+              <span class="material-icons text-4xl text-gray-400">lock</span>
               <p class="mt-2 text-gray-500 dark:text-gray-400">閲覧権限がありません</p>
             </div>
           </div>

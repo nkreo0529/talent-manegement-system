@@ -85,7 +85,7 @@ const activityIcons: Record<string, string> = {
 	<AppLayout>
 		<div class="space-y-6">
 			<!-- Welcome message -->
-			<div class="card bg-gradient-to-r from-primary-600 to-primary-700 text-black border-none">
+			<div class="card bg-gradient-to-r from-primary-600 to-primary-700 text-white border-none">
 				<div class="flex items-center justify-between">
 					<div>
 						<h1 class="text-2xl font-bold">
@@ -94,7 +94,7 @@ const activityIcons: Record<string, string> = {
 						<p class="mt-1 text-primary-100">今日も素晴らしい一日を！</p>
 					</div>
 					<div class="hidden md:block">
-						<span class="material-icons text-6xl text-primary-300">waving_hand</span>
+						<span class="material-icons text-6xl text-white/40">waving_hand</span>
 					</div>
 				</div>
 			</div>
@@ -135,9 +135,9 @@ const activityIcons: Record<string, string> = {
 								:key="action.label"
 								:to="action.to"
 								class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-border transition-colors">
-								<span class="material-icons text-gray-400">{{ action.icon }}</span>
+								<span class="material-icons text-gray-500">{{ action.icon }}</span>
 								<span class="text-gray-700 dark:text-gray-300">{{ action.label }}</span>
-								<span class="material-icons text-gray-300 ml-auto text-sm">chevron_right</span>
+								<span class="material-icons text-gray-400 ml-auto text-sm">chevron_right</span>
 							</router-link>
 						</div>
 					</div>
@@ -204,7 +204,7 @@ const activityIcons: Record<string, string> = {
 							:class="`text-${domain.color}-600 dark:text-${domain.color}-400`">
 							{{ domain.count }}
 						</p>
-						<p class="text-xs text-gray-500 dark:text-gray-500 mt-1">TOP5に含まれる数</p>
+						<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">TOP5に含まれる数</p>
 					</div>
 				</div>
 			</div>

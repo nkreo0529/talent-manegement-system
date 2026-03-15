@@ -303,8 +303,8 @@ const rareStrengths = computed(() => {
           <table class="w-full">
             <thead>
               <tr class="border-b border-gray-200 dark:border-dark-border">
-                <th class="text-left py-3 px-4 font-medium text-gray-500">チーム</th>
-                <th class="text-center py-3 px-4 font-medium text-gray-500">人数</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-500 dark:text-gray-400">チーム</th>
+                <th class="text-center py-3 px-4 font-medium text-gray-500 dark:text-gray-400">人数</th>
                 <th
                   v-for="domain in Object.keys(DOMAIN_NAMES)"
                   :key="domain"
