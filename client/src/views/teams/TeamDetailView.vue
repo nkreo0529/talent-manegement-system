@@ -130,7 +130,7 @@ function getMemberStrengths(employeeId: string) {
 
       <!-- Team not found -->
       <div v-else-if="!currentTeam" class="card text-center py-12">
-        <span class="material-icons text-5xl text-gray-300">group_off</span>
+        <span class="material-icons text-5xl text-gray-400">group_off</span>
         <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">チームが見つかりません</h3>
       </div>
 

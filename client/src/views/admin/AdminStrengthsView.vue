@@ -131,7 +131,7 @@ function saveStrengths() {
                 {{ strength.name }}
                 <span
                   v-if="currentStrengths.indexOf(strength.id) < 5 && currentStrengths.indexOf(strength.id) >= 0"
-                  class="ml-2 text-xs text-gray-400"
+                  class="ml-2 text-xs text-gray-500"
                 >
                   #{{ currentStrengths.indexOf(strength.id) + 1 }}
                 </span>

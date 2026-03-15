@@ -84,7 +84,7 @@ const teamColors = [
             class="h-24 -mx-6 -mt-6 mb-4 bg-gradient-to-r flex items-center justify-center"
             :class="teamColors[index % teamColors.length]"
           >
-            <span class="text-white/30 text-6xl font-bold group-hover:scale-110 transition-transform">
+            <span class="text-white/70 text-6xl font-bold group-hover:scale-110 transition-transform">
               {{ team.name.charAt(0) }}
             </span>
           </div>
@@ -124,7 +124,7 @@ const teamColors = [
 
       <!-- Empty state -->
       <div v-if="!loading && teams.length === 0" class="card text-center py-12">
-        <span class="material-icons text-5xl text-gray-300">groups</span>
+        <span class="material-icons text-5xl text-gray-400">groups</span>
         <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">チームが見つかりません</h3>
       </div>
     </div>
