@@ -281,7 +281,7 @@
 - 「@〇〇さんの成長を支援するためのアドバイスをください」
 
 **AIモデル:**
-Claude (Anthropic) を使用
+Claude Sonnet 4 (Anthropic) を使用。Server-Sent Events (SSE) によるストリーミングレスポンス対応。
 
 **利用制限:**
 | プラン | 月間相談回数 |
@@ -452,4 +452,4 @@ Claude (Anthropic) を使用
 
 ---
 
-*© 2024 TalentSync. All rights reserved.*
+*© 2025 TalentSync. All rights reserved.*

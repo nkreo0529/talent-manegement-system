@@ -137,5 +137,5 @@
 
 ---
 
-*© 2024 TalentSync. All rights reserved.*
+*© 2025 TalentSync. All rights reserved.*
 *ストレングスファインダー®はGallup, Inc.の登録商標です。*
