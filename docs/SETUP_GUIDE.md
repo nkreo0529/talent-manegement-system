@@ -1,254 +1,182 @@
-# タレントマネジメントシステム セットアップガイド
+# セットアップガイド
 
-このガイドでは、Supabaseを使用してデータベースを構築し、アプリケーションを本番環境で動作させる手順を説明します。
+このガイドでは、Neon PostgreSQL + Better Auth + Hono を使用した本番環境の構築手順を説明します。
 
 ---
 
 ## 目次
 
-1. [Supabaseプロジェクト作成](#1-supabaseプロジェクト作成)
-2. [データベーステーブル作成](#2-データベーステーブル作成)
+1. [前提条件](#1-前提条件)
+2. [Neon PostgreSQL セットアップ](#2-neon-postgresql-セットアップ)
 3. [環境変数の設定](#3-環境変数の設定)
-4. [認証設定](#4-認証設定)
+4. [データベーススキーマの反映](#4-データベーススキーマの反映)
 5. [初期データ投入](#5-初期データ投入)
 6. [アプリケーション起動](#6-アプリケーション起動)
-7. [Vercelデプロイ](#7-vercelデプロイ)
+7. [本番デプロイ](#7-本番デプロイ)
 8. [トラブルシューティング](#8-トラブルシューティング)
 
 ---
 
-## 1. Supabaseプロジェクト作成
+## 1. 前提条件
 
-### 1.1 アカウント作成
+| 要件 | バージョン |
+|------|-----------|
+| Node.js | >= 20 |
+| pnpm | >= 9 |
+| Git | 最新版 |
 
-1. [supabase.com](https://supabase.com) にアクセス
-2. 「Start your project」または「Sign Up」をクリック
-3. GitHub、Google、またはメールでアカウント作成
+```bash
+# pnpm のインストール（未導入の場合）
+npm install -g pnpm
 
-### 1.2 新規プロジェクト作成
-
-1. ダッシュボードで「New Project」をクリック
-2. 以下の情報を入力：
-
-| 項目 | 設定値 |
-|------|--------|
-| Organization | 選択または新規作成 |
-| Project name | `talent-management-system` |
-| Database Password | 強力なパスワード（必ずメモ） |
-| Region | `Northeast Asia (Tokyo)` |
-| Pricing Plan | Free tier で開始可能 |
-
-3. 「Create new project」をクリック
-4. プロジェクト作成完了まで2-3分待機
+# バージョン確認
+node -v   # v20.x.x 以上
+pnpm -v   # 9.x.x 以上
+```
 
 ---
 
-## 2. データベーステーブル作成
+## 2. Neon PostgreSQL セットアップ
 
-### 2.1 SQLエディタを開く
+### 2.1 アカウント作成
 
-1. Supabaseダッシュボードの左メニューから **SQL Editor** を選択
-2. 「New query」をクリック
+1. [neon.tech](https://neon.tech) にアクセス
+2. GitHub または メールでアカウント作成
 
-### 2.2 テーブル作成SQLの実行
+### 2.2 新規プロジェクト作成
 
-以下のファイルの内容を**順番に**実行します：
+| 項目 | 設定値 |
+|------|--------|
+| Project name | `talent-management-system` |
+| Region | `Asia Pacific (Singapore)` または近いリージョン |
+| PostgreSQL version | 最新版 |
 
-#### ステップ1: テーブル作成
+### 2.3 接続情報の取得
 
-ファイル: `supabase/migrations/001_create_tables.sql`
+プロジェクト作成後、ダッシュボードに表示される接続文字列をコピー:
 
-1. ファイルの内容をすべてコピー
-2. SQLエディタに貼り付け
-3. 「Run」ボタンをクリック
-4. 「Success」メッセージを確認
-
-#### ステップ2: セキュリティポリシー作成
-
-ファイル: `supabase/migrations/002_rls_policies.sql`
-
-1. ファイルの内容をすべてコピー
-2. SQLエディタに貼り付け
-3. 「Run」ボタンをクリック
-4. 「Success」メッセージを確認
-
-### 2.3 テーブル確認
-
-1. 左メニューの **Table Editor** を選択
-2. 以下の9テーブルが作成されていることを確認：
-   - `teams`
-   - `employees`
-   - `strengths`
-   - `spi_results`
-   - `careers`
-   - `evaluations`
-   - `one_on_one_notes`
-   - `ai_profiles`
-   - `ai_team_analysis`
+```
+postgresql://user:password@ep-xxxx.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+```
 
 ---
 
 ## 3. 環境変数の設定
 
-### 3.1 API情報の取得
-
-1. Supabaseダッシュボード → **Settings**（歯車アイコン）
-2. **API** セクションを選択
-3. 以下の値をコピー：
-
-| 項目 | 説明 |
-|------|------|
-| Project URL | `https://xxxxx.supabase.co` 形式のURL |
-| anon public | 公開用APIキー（フロントエンドで使用） |
-| service_role | 管理用APIキー（サーバーサイドのみ） |
-
-### 3.2 .envファイルの作成
-
-プロジェクトルートに `.env` ファイルを作成：
+### 3.1 .env ファイルの作成
 
 ```bash
 cp .env.example .env
 ```
 
-以下の内容を設定：
+### 3.2 必須項目の設定
 
 ```env
-# Supabase設定
-VITE_SUPABASE_URL=https://xxxxx.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+# データベース接続 (Neon PostgreSQL)
+DATABASE_URL=postgresql://user:password@host/dbname?sslmode=require
 
-# サーバーサイド用（Vercel環境変数にも設定）
-SUPABASE_URL=https://xxxxx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-
-# Anthropic API（AI機能用）
+# AI機能 (Anthropic Claude API)
 ANTHROPIC_API_KEY=sk-ant-api03-...
 
-# 開発モード設定（オプション）
-# VITE_DEMO_MODE=true  # デモモードを強制する場合
+# 認証シークレット (Better Auth)
+# openssl rand -base64 32 で生成推奨
+BETTER_AUTH_SECRET=ランダムな文字列
+
+# CORS許可オリジン
+CORS_ORIGIN=http://localhost:5173
+
+# フロントエンドからのAPI接続先
+VITE_API_BASE_URL=http://localhost:8080
 ```
 
-> ⚠️ **重要**: `.env` ファイルは `.gitignore` に含まれているため、Gitにコミットされません。
+### 3.3 Anthropic APIキーの取得
+
+1. [console.anthropic.com](https://console.anthropic.com) でアカウント作成
+2. API Keys セクションで新しいキーを発行
+3. `ANTHROPIC_API_KEY` に設定
+
+> **重要**: `.env` ファイルは `.gitignore` に含まれています。Git にコミットされません。
 
 ---
 
-## 4. 認証設定
+## 4. データベーススキーマの反映
 
-### 4.1 メール認証の有効化
+Drizzle ORM を使用してスキーマをデータベースに反映します。
 
-1. Supabaseダッシュボード → **Authentication**
-2. **Providers** タブを選択
-3. **Email** を展開して以下を設定：
+```bash
+# 依存関係のインストール
+pnpm install
 
-| 設定項目 | 推奨値 |
-|----------|--------|
-| Enable Email provider | ON |
-| Confirm email | ON（本番）/ OFF（開発） |
-| Enable email confirmations | 用途に応じて |
+# 共有型定義のビルド（初回必須）
+pnpm --filter @talent/types build
 
-### 4.2 URL設定
-
-1. **Authentication** → **URL Configuration**
-2. 以下を設定：
-
-**開発環境:**
-```
-Site URL: http://localhost:5173
-Redirect URLs: http://localhost:5173/**
+# スキーマをデータベースに反映
+pnpm db:push
 ```
 
-**本番環境（Vercel）:**
-```
-Site URL: https://your-app.vercel.app
-Redirect URLs: https://your-app.vercel.app/**
-```
+### 作成されるテーブル
 
-### 4.3 最初の管理者ユーザー作成
+#### 認証テーブル（Better Auth）
+- `user` - ユーザーアカウント
+- `session` - セッション管理
+- `account` - プロバイダーアカウント
+- `verification` - メール認証
 
-1. **Authentication** → **Users** タブ
-2. 「Add user」→「Create new user」
-3. メールアドレスとパスワードを入力
-4. SQLエディタで管理者権限を付与：
-
-```sql
--- 作成したユーザーのIDを確認
-SELECT id, email FROM auth.users;
-
--- employeesテーブルに管理者として登録
-INSERT INTO employees (auth_user_id, email, name, role)
-VALUES (
-  'ユーザーのUUID',
-  'admin@example.com',
-  '管理者',
-  'admin'
-);
-```
+#### ビジネステーブル
+- `teams` - チーム
+- `employees` - 社員
+- `strengths` - ストレングスファインダー結果
+- `spi_results` - SPI診断結果
+- `careers` - 経歴
+- `evaluations` - 評価
+- `one_on_one_notes` - 1on1記録
+- `ai_profiles` - AIプロフィール
+- `ai_team_analysis` - チームAI分析
 
 ---
 
 ## 5. 初期データ投入
 
-### 5.1 チームデータの投入
+### 5.1 シードデータの投入（推奨）
 
-```sql
-INSERT INTO teams (name, description) VALUES
-  ('開発チーム', 'プロダクト開発を担当'),
-  ('デザインチーム', 'UI/UXデザインを担当'),
-  ('営業チーム', '顧客開拓と関係構築'),
-  ('マーケティングチーム', 'ブランディングと集客'),
-  ('経営企画チーム', '戦略立案と組織運営');
+```bash
+pnpm db:seed
 ```
 
-### 5.2 社員データの投入
+これにより、サンプルのチーム・社員データが自動投入されます。
 
-```sql
--- チームIDを取得
-SELECT id, name FROM teams;
+### 5.2 手動での管理者ユーザー作成
 
--- 社員を追加（team_idは上記で確認した値を使用）
-INSERT INTO employees (email, name, team_id, job_title, job_type, role)
-VALUES
-  ('tanaka@example.com', '田中 太郎', 'チームのUUID', 'シニアエンジニア', 'engineer', 'manager'),
-  ('sato@example.com', '佐藤 花子', 'チームのUUID', 'デザイナー', 'designer', 'member');
+1. アプリケーションを起動してブラウザからアカウント作成
+2. Drizzle Studio でデータベースを操作して `employees` テーブルの `role` を `admin` に変更:
+
+```bash
+pnpm --filter @talent/server drizzle-kit studio
 ```
 
-### 5.3 ストレングスファインダーデータの投入
+3. または、直接SQLで更新:
 
 ```sql
--- 社員IDを確認
-SELECT id, name FROM employees;
-
--- ストレングスを追加
-INSERT INTO strengths (employee_id, strengths_order)
-VALUES (
-  '社員のUUID',
-  ARRAY['achiever', 'learner', 'strategic', 'analytical', 'focus',
-        'responsibility', 'deliberative', 'input', 'intellection', 'relator',
-        'competition', 'significance', 'self_assurance', 'command', 'activator',
-        'communication', 'woo', 'maximizer', 'developer', 'positivity',
-        'empathy', 'harmony', 'includer', 'individualization', 'connectedness',
-        'adaptability', 'arranger', 'belief', 'consistency', 'context',
-        'discipline', 'futuristic', 'ideation', 'restorative']
-);
+-- authUserId は user テーブルの id と一致させる
+UPDATE employees SET role = 'admin' WHERE email = 'admin@example.com';
 ```
 
 ---
 
 ## 6. アプリケーション起動
 
-### 6.1 依存関係のインストール
+### 6.1 開発モード
 
 ```bash
-npm install
+# 全サービス並列起動
+pnpm dev:all
+
+# または個別起動
+pnpm dev         # フロントエンド (http://localhost:5173)
+pnpm dev:server  # バックエンド (http://localhost:8080)
 ```
 
-### 6.2 開発サーバー起動
-
-```bash
-npm run dev
-```
-
-### 6.3 動作確認
+### 6.2 動作確認
 
 1. ブラウザで `http://localhost:5173` を開く
 2. ログイン画面が表示されることを確認
@@ -257,74 +185,102 @@ npm run dev
 
 ---
 
-## 7. Vercelデプロイ
+## 7. 本番デプロイ
 
-### 7.1 Vercel CLIのインストール
+### 7.1 デプロイ構成
+
+| コンポーネント | プラットフォーム |
+|----------------|-----------------|
+| フロントエンド | Vercel |
+| バックエンド | Google Cloud Run (asia-northeast1) |
+| データベース | Neon PostgreSQL |
+
+### 7.2 フロントエンド (Vercel)
+
+#### Vercel CLI インストール
 
 ```bash
 npm install -g vercel
 ```
 
-### 7.2 プロジェクトのリンク
+#### プロジェクトのリンクとデプロイ
 
 ```bash
 vercel link
-```
-
-### 7.3 環境変数の設定
-
-Vercelダッシュボード → Project Settings → Environment Variables で以下を設定：
-
-| 変数名 | 値 |
-|--------|-----|
-| VITE_SUPABASE_URL | Supabase Project URL |
-| VITE_SUPABASE_ANON_KEY | Supabase anon key |
-| SUPABASE_URL | Supabase Project URL |
-| SUPABASE_SERVICE_ROLE_KEY | Supabase service_role key |
-| ANTHROPIC_API_KEY | Anthropic APIキー |
-
-### 7.4 デプロイ
-
-```bash
 vercel --prod
 ```
 
-### 7.5 Supabase URL設定の更新
+#### Vercel 環境変数
 
-デプロイ後、SupabaseのURL Configurationを本番URLに更新：
+Vercel ダッシュボード → Project Settings → Environment Variables で設定:
 
-1. **Authentication** → **URL Configuration**
-2. Site URLを本番URLに変更
-3. Redirect URLsに本番URLを追加
+| 変数名 | 値 |
+|--------|-----|
+| `VITE_API_BASE_URL` | Cloud Run のサービスURL |
+
+> `vercel.json` で `/api/*` のリクエストを Cloud Run にリライトする設定済み。
+
+### 7.3 バックエンド (Google Cloud Run)
+
+GitHub Actions による自動デプロイが `.github/workflows/deploy-server.yml` で設定済みです。
+
+**自動デプロイの条件**: `main` ブランチへの push で `server/` または `shared/` 以下に変更があった場合。
+
+#### Cloud Run で必要な環境変数（シークレット）
+
+| 変数名 | 説明 |
+|--------|------|
+| `DATABASE_URL` | Neon PostgreSQL 接続文字列 |
+| `ANTHROPIC_API_KEY` | Claude API キー |
+| `BETTER_AUTH_SECRET` | セッション暗号化キー |
+| `CORS_ORIGIN` | Vercel のフロントエンドURL |
+
+### 7.4 手動デプロイ（Docker）
+
+```bash
+# ビルド
+docker build -t talent-mgmt-api .
+
+# 実行
+docker run -p 8080:8080 \
+  -e DATABASE_URL=... \
+  -e ANTHROPIC_API_KEY=... \
+  -e BETTER_AUTH_SECRET=... \
+  -e CORS_ORIGIN=... \
+  talent-mgmt-api
+```
 
 ---
 
 ## 8. トラブルシューティング
 
-### Q: デモモードのままでSupabaseに接続されない
+### Q: デモモードのままでバックエンドに接続されない
 
 **原因**: 環境変数が正しく読み込まれていない
 
 **解決策**:
 1. `.env` ファイルが存在するか確認
-2. `VITE_` プレフィックスが付いているか確認
-3. 開発サーバーを再起動: `npm run dev`
+2. `VITE_API_BASE_URL` が設定されているか確認
+3. バックエンドサーバーが起動しているか確認（`pnpm dev:server`）
+4. 開発サーバーを再起動
 
-### Q: RLSエラーでデータが取得できない
+### Q: データベース接続エラー
 
-**原因**: Row Level Securityポリシーが正しく設定されていない
+**原因**: `DATABASE_URL` が正しくないか、Neon プロジェクトが停止中
 
 **解決策**:
-1. `002_rls_policies.sql` を再実行
-2. ユーザーが `employees` テーブルに登録されているか確認
+1. Neon ダッシュボードでプロジェクトがアクティブか確認
+2. 接続文字列に `?sslmode=require` が含まれているか確認
+3. IP制限がかかっていないか確認
 
 ### Q: 認証後にリダイレクトされない
 
-**原因**: Supabase URL Configurationの設定ミス
+**原因**: CORS設定またはCookie設定のミスマッチ
 
 **解決策**:
-1. Site URLが正しいか確認
-2. Redirect URLsにワイルドカード (`/**`) が含まれているか確認
+1. `CORS_ORIGIN` がフロントエンドのURLと一致しているか確認
+2. `BETTER_AUTH_SECRET` が設定されているか確認
+3. ブラウザの開発者ツールでCookieがセットされているか確認
 
 ### Q: AI機能が動作しない
 
@@ -332,7 +288,18 @@ vercel --prod
 
 **解決策**:
 1. `ANTHROPIC_API_KEY` が設定されているか確認
-2. APIキーが有効か確認（Anthropicダッシュボードで確認）
+2. APIキーが有効か確認（[console.anthropic.com](https://console.anthropic.com) で確認）
+3. API利用枠が残っているか確認
+
+### Q: pnpm コマンドが見つからない
+
+**解決策**:
+```bash
+npm install -g pnpm
+# または
+corepack enable
+corepack prepare pnpm@9 --activate
+```
 
 ---
 
@@ -355,7 +322,9 @@ teams
 
 ## 参考リンク
 
-- [Supabase公式ドキュメント](https://supabase.com/docs)
-- [Supabase認証ガイド](https://supabase.com/docs/guides/auth)
-- [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security)
-- [Vercelデプロイガイド](https://vercel.com/docs)
+- [Neon PostgreSQL ドキュメント](https://neon.tech/docs)
+- [Drizzle ORM ドキュメント](https://orm.drizzle.team)
+- [Better Auth ドキュメント](https://www.better-auth.com)
+- [Hono ドキュメント](https://hono.dev)
+- [Vercel デプロイガイド](https://vercel.com/docs)
+- [Google Cloud Run ドキュメント](https://cloud.google.com/run/docs)

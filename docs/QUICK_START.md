@@ -4,43 +4,99 @@
 
 ---
 
+## 前提条件
+
+- **Node.js** >= 20
+- **pnpm** >= 9（`npm install -g pnpm` でインストール可能）
+
+---
+
 ## デモモードで試す（5分）
 
-Supabase設定なしで、ダミーデータを使って動作確認できます。
+環境変数の設定なしで、フロントエンドのダミーデータを使って動作確認できます。
 
 ```bash
-# 依存関係インストール
-npm install
+# リポジトリのクローン
+git clone https://github.com/nkreo0529/talent-manegement-system.git
+cd talent-management-system
 
-# 開発サーバー起動
-npm run dev
+# 依存関係インストール
+pnpm install
+
+# フロントエンド開発サーバー起動
+pnpm dev
 ```
 
-ブラウザで http://localhost:5173 を開く → 自動的にデモモードで起動
+ブラウザで http://localhost:5173 を開く → 環境変数未設定時は自動的にデモモードで起動します。
+
+> **Note**: デモモードではバックエンドAPIへの接続は行われず、クライアント内のモックデータが使用されます。
 
 ---
 
 ## 本番モードで動かす（30分）
 
-### Step 1: Supabase準備
+### Step 1: Neon PostgreSQL の準備
 
-1. [supabase.com](https://supabase.com) でプロジェクト作成
-2. SQL Editorで以下を実行：
-   - `supabase/migrations/001_create_tables.sql`
-   - `supabase/migrations/002_rls_policies.sql`
+1. [neon.tech](https://neon.tech) でアカウント作成
+2. 新規プロジェクトを作成（リージョン: Asia Pacific 推奨）
+3. 接続文字列（`DATABASE_URL`）を控える
 
 ### Step 2: 環境変数設定
+
+プロジェクトルートに `.env` ファイルを作成:
 
 ```bash
 cp .env.example .env
 ```
 
-`.env` を編集してSupabaseの値を設定
+`.env` を編集:
 
-### Step 3: 起動
+```env
+# データベース (Neon PostgreSQL)
+DATABASE_URL=postgresql://user:password@host/dbname?sslmode=require
+
+# AI機能 (Anthropic)
+ANTHROPIC_API_KEY=sk-ant-api03-...
+
+# 認証 (Better Auth)
+BETTER_AUTH_SECRET=ランダムな文字列（32文字以上推奨）
+
+# CORS
+CORS_ORIGIN=http://localhost:5173
+
+# フロントエンド用
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+### Step 3: データベースのセットアップ
 
 ```bash
-npm run dev
+# スキーマをデータベースに反映
+pnpm db:push
+
+# シードデータの投入（オプション）
+pnpm db:seed
+```
+
+### Step 4: 起動
+
+```bash
+# 全サービスを並列起動（フロントエンド + バックエンド）
+pnpm dev:all
+```
+
+- フロントエンド: http://localhost:5173
+- バックエンド: http://localhost:8080
+
+### Step 5: 初回ログイン
+
+1. ブラウザで http://localhost:5173 を開く
+2. 「アカウント作成」から管理者ユーザーを作成
+3. データベースで該当ユーザーの role を `admin` に変更:
+
+```bash
+# Drizzle Studio でGUIから変更可能
+pnpm --filter @talent/server drizzle-kit studio
 ```
 
 ---
@@ -51,8 +107,9 @@ npm run dev
 |-----|------|------|
 | `/` | ダッシュボード | 統計情報とクイックアクション |
 | `/employees` | 社員一覧 | 全社員の検索・フィルタリング |
-| `/employees/:id` | 社員詳細 | SF/SPI分析、AIプロフィール |
+| `/employees/:id` | 社員詳細 | SF/SPI分析、AIプロフィール（6タブ） |
 | `/teams` | チーム一覧 | チーム情報と構成 |
+| `/teams/:id` | チーム詳細 | メンバー一覧・AI分析 |
 | `/analysis/strengths` | SF分析 | 全社のストレングス分布 |
 | `/analysis/spi` | SPI分析 | 全社のSPI傾向 |
 | `/ai-consultation` | AI相談 | @メンションで社員情報を参照 |
@@ -63,15 +120,27 @@ npm run dev
 ## よく使うコマンド
 
 ```bash
-# 開発サーバー
-npm run dev
+# 開発
+pnpm dev              # フロントエンド開発サーバー
+pnpm dev:server       # バックエンド開発サーバー
+pnpm dev:all          # 全サービス並列起動
 
 # ビルド
-npm run build
+pnpm build            # 全体ビルド
 
-# 型チェック
-npm run type-check
+# データベース
+pnpm db:push          # スキーマ反映
+pnpm db:generate      # マイグレーション生成
+pnpm db:seed          # シードデータ投入
 
-# Vercelデプロイ
-vercel --prod
+# リント
+pnpm lint             # 全パッケージのリント実行
 ```
+
+---
+
+## 次のステップ
+
+- 本番デプロイ手順: [SETUP_GUIDE.md](./SETUP_GUIDE.md)
+- アーキテクチャ詳細: [ARCHITECTURE.md](./ARCHITECTURE.md)
+- 機能仕様: [02_FEATURE_SPECIFICATION.md](./02_FEATURE_SPECIFICATION.md)
