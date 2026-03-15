@@ -12,6 +12,7 @@ import { spiRoutes } from './routes/spi'
 import { evaluationRoutes } from './routes/evaluations'
 import { aiRoutes } from './routes/ai'
 import { adminRoutes } from './routes/admin'
+import { meRoutes } from './routes/me'
 
 // Create Hono app
 const app = new Hono()
@@ -57,6 +58,7 @@ app.route('/api/spi', spiRoutes)
 app.route('/api/evaluations', evaluationRoutes)
 app.route('/api/ai', aiRoutes)
 app.route('/api/admin', adminRoutes)
+app.route('/api/me', meRoutes)
 
 // Error handling
 app.onError((err, c) => {

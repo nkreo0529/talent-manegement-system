@@ -102,18 +102,31 @@ export const useAuthStore = defineStore('auth', () => {
       const session = await authClient.getSession()
 
       if (session.data?.user) {
-        const sessionUser = session.data.user as BetterAuthUser
-        user.value = {
-          id: sessionUser.id,
-          email: sessionUser.email,
-          name: sessionUser.name || '',
-          role: sessionUser.role || 'member',
-          employeeId: sessionUser.employeeId,
-        }
+        // サーバーの /api/me からロール・employeeIdを含む情報を取得
+        try {
+          const meResponse = await api<{ data: { id: string; email: string; name: string; role: UserRole; employeeId?: string } }>('/api/me')
+          user.value = {
+            id: meResponse.data.id,
+            email: meResponse.data.email,
+            name: meResponse.data.name,
+            role: meResponse.data.role,
+            employeeId: meResponse.data.employeeId,
+          }
 
-        // Fetch employee data if employeeId exists
-        if (sessionUser.employeeId) {
-          await fetchEmployee(sessionUser.employeeId)
+          // Fetch employee data if employeeId exists
+          if (meResponse.data.employeeId) {
+            await fetchEmployee(meResponse.data.employeeId)
+          }
+        } catch {
+          // /api/me が失敗した場合はセッション情報のみ使用
+          const sessionUser = session.data.user as BetterAuthUser
+          user.value = {
+            id: sessionUser.id,
+            email: sessionUser.email,
+            name: sessionUser.name || '',
+            role: sessionUser.role || 'member',
+            employeeId: sessionUser.employeeId,
+          }
         }
       }
     } catch (err) {
