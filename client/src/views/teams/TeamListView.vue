@@ -32,11 +32,11 @@ function goToTeam(id: string) {
 }
 
 const teamColors = [
-  'from-blue-500 to-blue-600',
-  'from-purple-500 to-purple-600',
-  'from-green-500 to-green-600',
-  'from-amber-500 to-amber-600',
-  'from-rose-500 to-rose-600',
+  'linear-gradient(to right, #3b82f6, #2563eb)',
+  'linear-gradient(to right, #a855f7, #9333ea)',
+  'linear-gradient(to right, #22c55e, #16a34a)',
+  'linear-gradient(to right, #f59e0b, #d97706)',
+  'linear-gradient(to right, #f43f5e, #e11d48)',
 ]
 </script>
 
@@ -81,8 +81,8 @@ const teamColors = [
         >
           <!-- Header gradient -->
           <div
-            class="h-24 -mx-6 -mt-6 mb-4 bg-gradient-to-r flex items-center justify-center"
-            :class="teamColors[index % teamColors.length]"
+            class="h-24 -mx-6 -mt-6 mb-4 flex items-center justify-center"
+            :style="{ background: teamColors[index % teamColors.length] }"
           >
             <span class="text-white/70 text-6xl font-bold group-hover:scale-110 transition-transform">
               {{ team.name.charAt(0) }}

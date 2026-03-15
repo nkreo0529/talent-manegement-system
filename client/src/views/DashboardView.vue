@@ -85,7 +85,7 @@ const activityIcons: Record<string, string> = {
 	<AppLayout>
 		<div class="space-y-6">
 			<!-- Welcome message -->
-			<div class="card bg-gradient-to-r from-primary-600 to-primary-700 text-white border-none">
+			<div class="card text-white border-none" style="background: linear-gradient(to right, #2563eb, #1d4ed8)">
 				<div class="flex items-center justify-between">
 					<div>
 						<h1 class="text-2xl font-bold">
@@ -115,7 +115,7 @@ const activityIcons: Record<string, string> = {
 							</span>
 						</div>
 						<div>
-							<p class="text-sm text-gray-500 dark:text-gray-400">{{ stat.label }}</p>
+							<p class="text-sm text-gray-600 dark:text-gray-400">{{ stat.label }}</p>
 							<p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stat.value }}</p>
 						</div>
 					</div>
@@ -155,8 +155,8 @@ const activityIcons: Record<string, string> = {
 								:key="index"
 								class="flex items-start space-x-3">
 								<div
-									class="w-10 h-10 rounded-full bg-gray-100 dark:bg-dark-border flex items-center justify-center shrink-0">
-									<span class="material-icons text-gray-500 text-lg">
+									class="w-10 h-10 rounded-full bg-gray-200 dark:bg-dark-border flex items-center justify-center shrink-0">
+									<span class="material-icons text-gray-600 text-lg">
 										{{ activityIcons[activity.type] }}
 									</span>
 								</div>

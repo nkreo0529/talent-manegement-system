@@ -125,7 +125,7 @@ const handleLogout = async () => {
           <!-- Dropdown -->
           <div v-else-if="item.children" class="space-y-1">
             <div
-              class="flex items-center px-3 py-2 text-gray-500 dark:text-gray-400"
+              class="flex items-center px-3 py-2 text-gray-600 dark:text-gray-400"
               :class="!appStore.sidebarOpen && 'justify-center'"
             >
               <span class="material-icons text-xl">{{ item.icon }}</span>
@@ -142,7 +142,7 @@ const handleLogout = async () => {
                 :class="[
                   isActive(child.to)
                     ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-dark-border',
+                    : 'text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-dark-border',
                 ]"
               >
                 {{ child.name }}

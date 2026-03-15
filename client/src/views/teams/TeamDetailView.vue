@@ -137,7 +137,7 @@ function getMemberStrengths(employeeId: string) {
       <!-- Team detail -->
       <template v-else>
         <!-- Header -->
-        <div class="card bg-gradient-to-r from-primary-600 to-primary-700 text-white border-none">
+        <div class="card text-white border-none" style="background: linear-gradient(to right, #2563eb, #1d4ed8)">
           <div class="flex flex-col md:flex-row md:items-center gap-6">
             <div class="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
               <span class="text-4xl font-bold">{{ currentTeam.name.charAt(0) }}</span>
