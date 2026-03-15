@@ -377,10 +377,202 @@ curl https://talent-mgmt-api-661290259058.asia-northeast1.run.app/health
 
 ---
 
+## ステップ10: シードデータ投入（完了）
+
+### 何をしたか
+`pnpm db:seed` で本番Neon DBに40人分のサンプルデータを投入した。
+
+### 投入データ
+
+| データ | 件数 |
+|--------|------|
+| チーム | 5 |
+| 従業員 | 40 |
+| ストレングス（34資質） | 40 |
+| SPI結果 | 30 |
+| キャリア履歴 | 60 |
+| 評価記録 | 58 |
+
+### 修正した点
+`server/package.json` の `db:seed` スクリプトに `--env-file=.env` を追加。`tsx` はデフォルトでは `.env` ファイルを読み込まないため、Node.js 20.6+ の `--env-file` フラグで明示的に読み込む。
+
+```json
+"db:seed": "tsx --env-file=.env src/db/seed.ts"
+```
+
+### 学んだこと
+- `tsx` / `node` はデフォルトでは `.env` を読み込まない（`dotenv` パッケージか `--env-file` フラグが必要）
+- `drizzle-kit` は自前で `.env` を読むので修正不要だが、自作スクリプトには `--env-file` が必要
+- シードスクリプトは `user`/`session` テーブル（better-auth管理）には触れないので、ログインユーザーは影響なし
+
+---
+
+## ステップ11: CI/CD設定（完了）
+
+### 何をしたか
+GitHub Actionsからサーバーを自動デプロイするための認証基盤（Workload Identity Federation）とシークレット管理（GCP Secret Manager）を構築した。
+
+### CI/CDの全体像
+
+```
+GitHub (push to main)
+    │
+    │ server/** or shared/** に変更
+    │
+    ▼
+GitHub Actions (deploy-server.yml)
+    │
+    │ ① WIF でGCP認証（サービスアカウントキー不要）
+    │ ② Docker build → Artifact Registry に push
+    │ ③ Cloud Run にデプロイ（Secret ManagerからDB接続情報等を注入）
+    │
+    ▼
+Cloud Run (新リビジョンで稼働)
+```
+
+### クライアント側のCI/CD
+Vercelの**Git連携で自動デプロイ**されるため、GitHub Actionsからのデプロイは不要。`deploy-client.yml` は削除した。二重デプロイを防ぐため。
+
+### Workload Identity Federation (WIF) とは
+
+従来のGCP認証ではサービスアカウントキー（JSONファイル）が必要だったが、WIFでは**GitHub ActionsのOIDCトークン**を使ってGCPに認証できる。
+
+```
+【従来】GitHub Actions → サービスアカウントキー（JSON）→ GCP
+        → キーの漏洩リスク、定期的なローテーションが必要
+
+【WIF】 GitHub Actions → OIDCトークン → Workload Identity Pool → GCP
+        → キー不要、トークンは短命（自動失効）、リポジトリ単位で制限可能
+```
+
+### WIF設定手順
+
+#### 1. サービスアカウント作成
+```bash
+gcloud iam service-accounts create github-actions-deploy \
+  --display-name="GitHub Actions Deploy" \
+  --project=talent-management-489923
+```
+
+#### 2. サービスアカウントに必要なロールを付与
+```bash
+SA_EMAIL="github-actions-deploy@talent-management-489923.iam.gserviceaccount.com"
+PROJECT="talent-management-489923"
+
+# 4つのロールを付与
+gcloud projects add-iam-policy-binding $PROJECT \
+  --member="serviceAccount:$SA_EMAIL" --role="roles/run.admin"              # Cloud Runデプロイ
+gcloud projects add-iam-policy-binding $PROJECT \
+  --member="serviceAccount:$SA_EMAIL" --role="roles/artifactregistry.writer" # イメージpush
+gcloud projects add-iam-policy-binding $PROJECT \
+  --member="serviceAccount:$SA_EMAIL" --role="roles/iam.serviceAccountUser"  # SA利用権限
+gcloud projects add-iam-policy-binding $PROJECT \
+  --member="serviceAccount:$SA_EMAIL" --role="roles/secretmanager.secretAccessor" # シークレット読取
+```
+
+| ロール | 用途 |
+|--------|------|
+| `roles/run.admin` | Cloud Runサービスのデプロイ・更新 |
+| `roles/artifactregistry.writer` | Dockerイメージのpush |
+| `roles/iam.serviceAccountUser` | Cloud Runがサービスアカウントとして動作するため |
+| `roles/secretmanager.secretAccessor` | Secret Managerからシークレットを読み取り |
+
+#### 3. Workload Identity Pool 作成
+```bash
+gcloud iam workload-identity-pools create "github-pool" \
+  --project="talent-management-489923" \
+  --location="global" \
+  --display-name="GitHub Actions Pool"
+```
+
+#### 4. OIDC プロバイダー作成
+```bash
+gcloud iam workload-identity-pools providers create-oidc "github-provider" \
+  --project="talent-management-489923" \
+  --location="global" \
+  --workload-identity-pool="github-pool" \
+  --display-name="GitHub Provider" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository" \
+  --attribute-condition="assertion.repository=='nkreo0529/talent-manegement-system'" \
+  --issuer-uri="https://token.actions.githubusercontent.com"
+```
+
+- `--attribute-condition` で**このリポジトリからのリクエストのみ許可**する（セキュリティ上重要）
+- `--issuer-uri` はGitHub Actionsが発行するOIDCトークンの発行元
+
+#### 5. サービスアカウントにWIFバインディング設定
+```bash
+PROJECT_NUMBER="661290259058"  # gcloud projects describe で取得可能
+gcloud iam service-accounts add-iam-policy-binding \
+  "$SA_EMAIL" \
+  --project="talent-management-489923" \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="principalSet://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github-pool/attribute.repository/nkreo0529/talent-manegement-system"
+```
+
+### GCP Secret Manager
+
+Cloud Runの環境変数としてシークレットを直接埋め込む代わりに、**Secret Manager**で一元管理する。CI/CDデプロイ時に `deploy-cloudrun` アクションが自動注入する。
+
+#### 登録済みシークレット
+
+| シークレット名 | 内容 |
+|---------------|------|
+| `DATABASE_URL` | Neon DB接続文字列 |
+| `BETTER_AUTH_SECRET` | セッション暗号化キー |
+| `CORS_ORIGIN` | フロントエンドURL |
+| `ANTHROPIC_API_KEY` | AI機能用（プレースホルダー） |
+
+#### シークレットの操作コマンド
+```bash
+# 値の確認
+gcloud secrets versions access latest --secret=SECRET_NAME --project=talent-management-489923
+
+# 値の更新
+echo -n '新しい値' | gcloud secrets versions add SECRET_NAME --data-file=- --project=talent-management-489923
+
+# 一覧表示
+gcloud secrets list --project=talent-management-489923
+```
+
+### Artifact Registry
+
+Dockerイメージの保管場所。Cloud Buildが自動ビルドする場合とは異なり、GitHub ActionsでDocker buildしたイメージをここにpushし、Cloud Runが参照する。
+
+```bash
+# リポジトリ作成コマンド
+gcloud artifacts repositories create talent-mgmt-api \
+  --repository-format=docker \
+  --location=asia-northeast1 \
+  --description="Talent Management API Docker images"
+```
+
+### GitHub Secrets に設定した値
+
+| Secret名 | 値 |
+|-----------|-----|
+| `GCP_PROJECT_ID` | `talent-management-489923` |
+| `WIF_PROVIDER` | `projects/661290259058/locations/global/workloadIdentityPools/github-pool/providers/github-provider` |
+| `WIF_SERVICE_ACCOUNT` | `github-actions-deploy@talent-management-489923.iam.gserviceaccount.com` |
+
+### deploy-server.yml の修正点
+
+| 修正内容 | 修正前 | 修正後 | 理由 |
+|---------|--------|--------|------|
+| サービス名 | `talent-api` | `talent-mgmt-api` | 手動デプロイと統一 |
+| Dockerfile | `-f server/Dockerfile` | ルートの `Dockerfile` を使用 | `server/Dockerfile` はマルチステージ版で動作しない（moduleResolution非互換） |
+| Artifact Registry名 | `talent-api/` | `talent-mgmt-api/` | サービス名と統一 |
+
+### 学んだこと
+- WIFはサービスアカウントキーなしで安全に認証できる。OIDCトークンは短命で自動失効するため、キー漏洩リスクがない
+- `--attribute-condition` でリポジトリを制限しないと、他のGitHubリポジトリからもGCPにアクセスできてしまう
+- Secret Managerで一元管理すると、環境変数の値を変更する際にCloud Runの再デプロイが不要
+- Vercel Git連携済みの場合、GitHub Actionsからの追加デプロイは二重デプロイになる
+
+---
+
 ## 残りの作業
 
 | # | ステップ | 状態 |
 |---|---------|------|
-| 1 | シードデータ投入 | ⬜ |
-| 2 | CI/CD設定（GitHub Secrets） | ⬜ |
-| 3 | ANTHROPIC_API_KEY設定（AI機能有効化時） | ⬜ |
+| 1 | ANTHROPIC_API_KEY設定（AI機能有効化時） | ⬜ |
