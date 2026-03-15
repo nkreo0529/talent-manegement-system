@@ -314,7 +314,7 @@ const traitDistribution = computed(() => {
       </div>
 
       <!-- Insights -->
-      <div class="card bg-gradient-to-r from-primary-50 to-blue-50 dark:from-primary-900/20 dark:to-blue-900/20 border-primary-200 dark:border-primary-800">
+      <div class="card border-primary-200 dark:border-primary-800" style="background: linear-gradient(to right, #eff6ff, #eff6ff)">
         <div class="flex items-start space-x-4">
           <div class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center shrink-0">
             <span class="material-icons text-primary-600 dark:text-primary-400">insights</span>
