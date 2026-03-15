@@ -38,23 +38,3 @@
 | [QUICK_START.md](./docs/QUICK_START.md) | 開発者 | クイックスタートガイド |
 
 ---
-
-## ドキュメントの更新
-
-各ドキュメントの最終更新日は、ドキュメント末尾に記載されています。
-
-重要な更新があった場合は、変更履歴を記録してください。
-
----
-
-## お問い合わせ
-
-ドキュメントに関するご質問・フィードバックは以下までお願いします。
-
-- **製品に関するお問い合わせ**: sales@talentsync.example.com
-- **技術サポート**: support@talentsync.example.com
-- **セキュリティに関する報告**: security@talentsync.example.com
-
----
-
-*© 2024 TalentSync. All rights reserved.*
